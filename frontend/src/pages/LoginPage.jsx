@@ -11,10 +11,10 @@ const LoginPage = () => {
         setIsRegister(!isRegister)
     }
 
-    const hanldeSubmit = async (formData) => {
+    const handleSubmit = async (formData) => {
         const url = isRegister ? '/register' : '/login';
         try {
-            const response = await fetch('http://localhost:5173/usersRoutes/' + url, {
+            const response = await fetch(`http://localhost:3000/api/users${url}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -24,15 +24,28 @@ const LoginPage = () => {
 
             const result = await response.json();
 
+            if (response.ok) {
+                if (isRegister) {
+                    alert('Registrazione completata con successo!');
+                    setIsRegister(false); // Switch to login form
+                } else {
+                    // Store token in localStorage
+                    localStorage.setItem('token', result.token);
+                    // Redirect or handle successful login
+                    alert('Login effettuato con successo!');
+                }
+            } else {
+                alert(result.message || 'Errore durante l\'operazione');
+            }
         } catch (error) {
-            console.error('Errore durante la richiesta ', error);
+            console.error('Errore durante la richiesta:', error);
+            alert('Errore di connessione al server');
         }
-
     }
 
     return (
         <div className="login-container">
-            <AuthForm isRegister={isRegister} onToggle={switchForm} onSubmit={hanldeSubmit} />
+            <AuthForm isRegister={isRegister} onToggle={switchForm} onSubmit={handleSubmit} />
         </div>
     );
 };
