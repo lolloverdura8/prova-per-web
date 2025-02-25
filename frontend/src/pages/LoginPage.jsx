@@ -1,6 +1,7 @@
 // /src/pages/LoginPage.jsx
 import React from "react";
-import "../styles/Global.css"; // Importiamo lo stile globale
+import '../styles/LoginPage.css'
+import "../styles/Global.css"; // Importiamo lo stile globale   
 import AuthForm from "../components/AuthForm";
 import { useState } from "react";
 import { useNavigate } from 'react-router-dom';
