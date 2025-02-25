@@ -6,8 +6,16 @@ const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     useEffect(() => {
-        axios.get("http://localhost:3000/api/users/profile", {
-            withCredentials: true,
+        const token = localStorage.getItem('token');
+        if (!token) {
+            setUser(null);
+            return;
+        }
+
+        axios.get("http://0.0.0.0:3000/api/users/profile", {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
         }).then((response) => {
             setUser(response.data);
         }).catch(() => setUser(null))

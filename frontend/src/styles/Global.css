@@ -1,15 +1,18 @@
-/* /src/styles/global.css */
-body, html {
-    height: 100%;
+/* Reset CSS di base */
+* {
     margin: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: #1e3c72; /*colore*/
-    font-family: 'Poppins', sans-serif;
-    color: #333;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-* {
-    box-sizing: border-box;
+body,
+html {
+    width: 100%;
+    height: 100%;
+    font-family: 'Poppins', sans-serif;
+}
+
+#root {
+    width: 100%;
+    height: 100%;
 }

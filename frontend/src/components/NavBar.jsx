@@ -11,7 +11,7 @@ const Navbar = () => {
             {user && (
                 <div className="user-info">
                     <img src={user.avatar || "https://via.placeholder.com/40"} alt="Avatar" className="avatar" />
-                    <span>{user.username}</span>
+                    <span className="username">{user.username}</span>
                 </div>
             )}
         </div>

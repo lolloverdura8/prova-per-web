@@ -3,9 +3,13 @@ import React from "react";
 import "../styles/Global.css"; // Importiamo lo stile globale
 import AuthForm from "../components/AuthForm";
 import { useState } from "react";
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 const LoginPage = () => {
     const [isRegister, setIsRegister] = useState(false)
+    const navigate = useNavigate();
+    const { setUser } = useAuth();
 
     const switchForm = () => {
         setIsRegister(!isRegister)
@@ -31,7 +35,8 @@ const LoginPage = () => {
                 } else {
                     // Store token in localStorage
                     localStorage.setItem('token', result.token);
-                    // Redirect or handle successful login
+                    setUser(result.user);
+                    navigate('/home')
                     alert('Login effettuato con successo!');
                 }
             } else {
