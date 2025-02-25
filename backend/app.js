@@ -4,8 +4,10 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 //const http = require('http');
 //const { Server } = require('socket.io');
-//rotta di user
+
 const userRoutes = require("./routes/usersRoutes");
+const postRoutes = require("./routes/postRoutes");
+
 
 const app = express();
 
@@ -17,8 +19,10 @@ app.use(
     }),
 );
 
-//rotta di user
+
 app.use("/api/users", userRoutes);
+app.use("/api/posts", postRoutes);
+
 
 mongoose
     .connect(process.env.MONGODB_URI)
@@ -38,8 +42,10 @@ io.on('connection', (socket) => {
     console.log('Client connected');
 });
 */
-
+const PORT = process.env.PORT || 3000;
 // Avvio Server
-app.listen(3000, "0.0.0.0", () => {
-    console.log("app in ascolto su porta 3000");
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Server in ascolto su porta ${PORT}`);
+}).on('error', (err) => {
+    console.error('Errore durante l\'avvio del server:', err);
 });
