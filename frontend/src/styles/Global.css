@@ -1,10 +1,12 @@
 :root {
-    /* Palette di colori */
+    /* Palette di colori - basata sul viola */
     --primary: #6200ee;         /* Viola principale */
     --primary-dark: #3700b3;    /* Viola scuro */
     --primary-light: #bb86fc;   /* Viola chiaro */
-    --secondary: #03dac6;       /* Accento */
-    --error: #cf6679;           /* Errore */
+    --primary-variant: #9370DB; /* Viola più chiaro per variazioni */
+    --secondary: #b39ddb;       /* Tono viola secondario */
+    --accent: #e0e0e0;          /* Accento neutro */
+    --error: #b00020;           /* Errore - rosso scuro più sobrio */
     
     /* Colori di sfondo */
     --bg-dark: #121212;         /* Sfondo principale scuro */
@@ -19,6 +21,7 @@
     
     /* Colori bordi */
     --border-light: rgba(255, 255, 255, 0.12);  /* Bordi leggeri */
+    --border-primary: rgba(187, 134, 252, 0.3); /* Bordo primario con colore viola */
     
     /* Dimensioni tipografiche */
     --font-size-xs: 0.75rem;    /* 12px */
@@ -38,8 +41,8 @@
     /* Bordi arrotondati */
     --radius-sm: 4px;
     --radius-md: 8px;
-    --radius-lg: 16px;
-    --radius-xl: 24px;
+    --radius-lg: 12px; /* Ridotto per un look più minimal */
+    --radius-xl: 16px; /* Ridotto per un look più minimal */
     
     /* Animazioni */
     --transition-fast: 0.15s ease;
@@ -108,8 +111,8 @@ input, textarea, select {
 
 /* Stili per scrollbar */
 ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+    width: 6px;
+    height: 6px;
 }
 
 ::-webkit-scrollbar-track {

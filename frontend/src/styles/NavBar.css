@@ -1,26 +1,19 @@
 .nav-bar {
     width: 100%;
-    background-color: var(--bg-elevation-2);
+    background-color: var(--bg-elevation-1);
     color: var(--text-primary);
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: var(--spacing-md) var(--spacing-lg);
-    margin-bottom: var(--spacing-lg);
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
     border-radius: var(--radius-md);
-    box-shadow: var(--shadow-md);
-    position: sticky;
-    top: var(--spacing-sm);
-    z-index: 10;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
     border: 1px solid var(--border-light);
 }
 
 .nav-bar h2 {
-    font-size: var(--font-size-xl);
+    font-size: var(--font-size-lg);
     font-weight: 600;
-    letter-spacing: 0.5px;
     color: var(--primary-light);
 }
 
@@ -28,21 +21,20 @@
     display: flex;
     align-items: center;
     gap: var(--spacing-sm);
-    background-color: rgba(255, 255, 255, 0.05);
-    padding: var(--spacing-xs) var(--spacing-md);
+    background-color: var(--bg-elevation-2);
+    padding: var(--spacing-xs) var(--spacing-sm);
     border-radius: 50px;
-    transition: all var(--transition-normal);
     border: 1px solid var(--border-light);
+    transition: border-color var(--transition-normal);
 }
 
 .user-info:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-    transform: translateY(-2px);
+    border-color: var(--primary-light);
 }
 
 .avatar {
-    width: 36px;
-    height: 36px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
     object-fit: cover;
     border: 2px solid var(--primary-light);
@@ -53,7 +45,6 @@
     font-weight: 500;
     color: var(--text-primary);
 }
-
 /* Animazione del logo/titolo */
 .nav-bar h2 {
     position: relative;

@@ -1,14 +1,19 @@
-import React, { useState } from "react";
+import React from "react";
 import { FaHome, FaBell, FaUser, FaCog, FaSearch, FaBookmark } from "react-icons/fa";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import "../styles/Sidebar.css";
 
 const Sidebar = () => {
     const location = useLocation();
+    const navigate = useNavigate();
     const path = location.pathname;
     
     const isActive = (route) => {
         return path === route;
+    };
+
+    const navigateTo = (route) => {
+        navigate(route);
     };
 
     return (
@@ -17,11 +22,17 @@ const Sidebar = () => {
                 US
             </div>
             
-            <div className={`icon ${isActive('/home') ? 'active' : ''}`}>
+            <div 
+                className={`icon ${isActive('/home') ? 'active' : ''}`}
+                onClick={() => navigateTo('/home')}
+            >
                 <FaHome />
             </div>
             
-            <div className="icon">
+            <div 
+                className={`icon ${isActive('/search') ? 'active' : ''}`}
+                onClick={() => navigateTo('/search')}
+            >
                 <FaSearch />
             </div>
             

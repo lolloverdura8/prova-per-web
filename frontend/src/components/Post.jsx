@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from 'axios';
 import { Comments, AddComment } from "./Comment";
+import { FaHeart, FaRegHeart, FaComment } from "react-icons/fa";
 import '../styles/Post.css';
 
 const Post = ({ post }) => {
@@ -89,14 +90,24 @@ const Post = ({ post }) => {
                 <button
                     className={`action-button ${isLiked ? 'liked' : ''}`}
                     onClick={handleLike}
+                    aria-label={isLiked ? "Rimuovi Mi piace" : "Mi piace"}
                 >
-                    {isLiked ? 'Mi piace' : 'Mi piace'} ({likesCount})
+                    <span className="button-text">Mi piace</span>
+                    {isLiked ? (
+                        <FaHeart className="action-icon" />
+                    ) : (
+                        <FaRegHeart className="action-icon" />
+                    )}
+                    <span className="count-badge">{likesCount}</span>
                 </button>
+                
                 <button
                     className="action-button"
                     onClick={() => setShowComments(!showComments)}
                 >
-                    Commenti ({postComments.length})
+                    <span className="button-text">Commenti</span>
+                    <FaComment className="action-icon" />
+                    <span className="count-badge">{postComments.length}</span>
                 </button>
             </div>
 

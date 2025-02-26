@@ -130,5 +130,34 @@ module.exports = {
         } catch (err) {
             res.status(500).json({ error: err.message });
         }
-    }
+    },
+
+    // Ricerca post per contenuto
+    searchPosts : async (req, res) => {
+        try {
+            const { query } = req.query;
+            
+            if (!query) {
+                return res.status(400).json({ message: "Parametro di ricerca mancante" });
+            }
+            
+            // Crea un'espressione regolare case-insensitive per la ricerca
+            const searchRegex = new RegExp(query, 'i');
+            
+            // Cerca nei post per descrizione o tag che corrispondono alla query
+            const posts = await Post.find({
+                $or: [
+                    { description: { $regex: searchRegex } },
+                    { tags: { $in: [searchRegex] } }
+                ]
+            })
+            .populate('author', 'username avatar')
+            .sort({ createdAt: -1 }); // Ordina per i più recenti prima
+            
+            res.json(posts);
+        } catch (error) {
+            console.error("Errore durante la ricerca:", error);
+            res.status(500).json({ message: "Errore del server durante la ricerca" });
+        }
+    },
 };
