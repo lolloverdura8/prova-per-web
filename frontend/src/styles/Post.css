@@ -6,6 +6,11 @@
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.1);
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease;
+}
+
+.post:hover {
+    transform: translateY(-3px);
 }
 
 .post-header {
@@ -38,6 +43,28 @@
     font-size: 1em;
 }
 
+/* New styles for tags */
+.post-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 15px 0;
+}
+
+.tag {
+    background: rgba(41, 128, 185, 0.3);
+    border-radius: 15px;
+    padding: 4px 10px;
+    font-size: 0.8em;
+    color: white;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.tag:hover {
+    background: rgba(41, 128, 185, 0.5);
+}
+
 .post-actions {
     display: flex;
     gap: 15px;
@@ -61,4 +88,12 @@
 .action-button:hover {
     background: rgba(52, 152, 219, 0.4);
     transform: translateY(-2px);
+}
+
+.action-button.liked {
+    background: rgba(231, 76, 60, 0.3);
+}
+
+.action-button.liked:hover {
+    background: rgba(231, 76, 60, 0.5);
 }

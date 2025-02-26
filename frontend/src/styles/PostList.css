@@ -1,5 +1,106 @@
-.post-list {
+.post-list-container {
     max-width: 800px;
     margin: 0 auto;
+}
+
+.post-list {
+    margin-top: 20px;
+}
+
+.filter-container {
+    background: rgba(41, 128, 185, 0.15);
+    border-radius: 15px;
     padding: 20px;
+    margin-bottom: 20px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.filter-container h3 {
+    color: white;
+    margin-bottom: 15px;
+    text-align: left;
+    font-size: 1.2rem;
+}
+
+.filter-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    align-items: flex-end;
+}
+
+.filter-group {
+    flex: 1;
+    min-width: 150px;
+    display: flex;
+    flex-direction: column;
+}
+
+.filter-group label {
+    color: white;
+    margin-bottom: 5px;
+    font-size: 0.9rem;
+    text-align: left;
+}
+
+.filter-group select,
+.filter-group input {
+    padding: 8px 12px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #e6e6e6;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.filter-group select:focus,
+.filter-group input:focus {
+    outline: none;
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+.clear-filters-btn {
+    background: rgba(231, 76, 60, 0.2);
+    border: 1px solid rgba(231, 76, 60, 0.3);
+    color: white;
+    padding: 8px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+    height: 38px;
+}
+
+.clear-filters-btn:hover {
+    background: rgba(231, 76, 60, 0.4);
+}
+
+.loading-container,
+.error-container,
+.no-posts {
+    background: rgba(52, 73, 94, 0.2);
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    color: white;
+    margin: 20px 0;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.error-container {
+    background: rgba(231, 76, 60, 0.2);
+    border-color: rgba(231, 76, 60, 0.3);
+}
+
+@media (max-width: 768px) {
+    .filter-controls {
+        flex-direction: column;
+    }
+
+    .filter-group {
+        width: 100%;
+    }
 }

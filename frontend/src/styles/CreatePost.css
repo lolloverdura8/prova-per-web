@@ -1,0 +1,92 @@
+.create-post {
+    background: rgba(41, 128, 185, 0.15);
+    border-radius: 15px;
+    padding: 25px;
+    margin: 0 0 20px 0;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.create-post h3 {
+    color: white;
+    margin-bottom: 15px;
+    text-align: left;
+    font-weight: 600;
+}
+
+.input-area {
+    width: 100%;
+    margin-bottom: 15px;
+}
+
+.input-area textarea {
+    width: 100%;
+    min-height: 100px;
+    padding: 15px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #e6e6e6;
+    font-size: 16px;
+    font-weight: 500;
+    resize: vertical;
+}
+
+.input-area textarea:focus {
+    outline: none;
+    border-color: rgba(41, 128, 185, 0.5);
+}
+
+.tags-input input {
+    width: 100%;
+    padding: 12px 15px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #e6e6e6;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.tags-input input:focus {
+    outline: none;
+    border-color: rgba(41, 128, 185, 0.5);
+}
+
+.helper-text {
+    display: block;
+    margin-top: 5px;
+    color: rgba(255, 255, 255, 0.85);
+    text-align: left;
+    font-size: 0.85rem;
+}
+
+.post-button {
+    background: #3498db;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 30px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    float: right;
+}
+
+.post-button:hover:not(:disabled) {
+    background: #2980b9;
+    transform: translateY(-2px);
+}
+
+.post-button:disabled {
+    background: rgba(52, 152, 219, 0.5);
+    cursor: not-allowed;
+}
+
+.error-message {
+    color: #e74c3c;
+    margin-top: 10px;
+    text-align: left;
+    clear: both;
+}

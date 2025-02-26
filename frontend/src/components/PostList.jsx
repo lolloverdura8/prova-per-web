@@ -3,34 +3,154 @@ import axios from 'axios';
 import Post from "./Post";
 import '../styles/PostList.css';
 
-const PostList = () => {
-    const [posts, setPost] = useState([]);
+const PostList = ({ refreshTrigger }) => {
+    const [posts, setPosts] = useState([]);
+    const [filteredPosts, setFilteredPosts] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
+
+    // Filter states
+    const [userFilter, setUserFilter] = useState('');
+    const [dateFilter, setDateFilter] = useState('');
+    const [tagFilter, setTagFilter] = useState('');
+
+    // Get unique authors from posts
+    const uniqueAuthors = [...new Set(posts.map(post => post.author?.username).filter(Boolean))];
+
+    // Get unique tags from posts
+    const uniqueTags = [...new Set(posts.flatMap(post => post.tags || []).filter(Boolean))];
 
     useEffect(() => {
         const fetchPosts = async () => {
+            setLoading(true);
+            setError('');
             try {
                 const response = await axios.get('http://localhost:3000/api/posts');
-                setPost(response.data);
+                if (response.data) {
+                    setPosts(response.data);
+                    setFilteredPosts(response.data);
+                } else {
+                    setError('No posts found');
+                }
             } catch (error) {
                 console.error('Error fetching posts:', error);
+                setError('Failed to load posts. Please try again later.');
             } finally {
                 setLoading(false);
             }
-        }
+        };
+
         fetchPosts();
+    }, [refreshTrigger]); // Re-fetch when refreshTrigger changes
 
-    }, []);
+    // Apply filters whenever filter states or posts change
+    useEffect(() => {
+        let result = [...posts];
 
-    if (loading) return <div>Loading posts...</div>;
+        // Filter by user
+        if (userFilter) {
+            result = result.filter(post =>
+                post.author?.username?.toLowerCase() === userFilter.toLowerCase()
+            );
+        }
+
+        // Filter by date
+        if (dateFilter) {
+            const filterDate = new Date(dateFilter);
+            result = result.filter(post => {
+                const postDate = new Date(post.createdAt);
+                return (
+                    postDate.getFullYear() === filterDate.getFullYear() &&
+                    postDate.getMonth() === filterDate.getMonth() &&
+                    postDate.getDate() === filterDate.getDate()
+                );
+            });
+        }
+
+        // Filter by tag
+        if (tagFilter) {
+            result = result.filter(post =>
+                post.tags && post.tags.includes(tagFilter)
+            );
+        }
+
+        setFilteredPosts(result);
+    }, [posts, userFilter, dateFilter, tagFilter]);
+
+    const clearFilters = () => {
+        setUserFilter('');
+        setDateFilter('');
+        setTagFilter('');
+    };
+
+    if (loading) return <div className="loading-container">Caricamento post...</div>;
+    if (error) return <div className="error-container">{error}</div>;
 
     return (
-        <div className="post-list">
-            {posts.length > 0 ? (
-                posts.map(post => (<Post key={post._id} post={post} />))
-            ) : (
-                <div className="no-posts">No posts available</div>
-            )}
+        <div className="post-list-container">
+            <div className="filter-container">
+                <h3>Filtra Post</h3>
+                <div className="filter-controls">
+                    <div className="filter-group">
+                        <label htmlFor="user-filter">Per Autore:</label>
+                        <select
+                            id="user-filter"
+                            value={userFilter}
+                            onChange={(e) => setUserFilter(e.target.value)}
+                        >
+                            <option value="">Tutti gli Autori</option>
+                            {uniqueAuthors.map((author, index) => (
+                                <option key={index} value={author}>{author}</option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <div className="filter-group">
+                        <label htmlFor="date-filter">Per Data:</label>
+                        <input
+                            type="date"
+                            id="date-filter"
+                            value={dateFilter}
+                            onChange={(e) => setDateFilter(e.target.value)}
+                        />
+                    </div>
+
+                    {uniqueTags.length > 0 && (
+                        <div className="filter-group">
+                            <label htmlFor="tag-filter">Per Tag:</label>
+                            <select
+                                id="tag-filter"
+                                value={tagFilter}
+                                onChange={(e) => setTagFilter(e.target.value)}
+                            >
+                                <option value="">Tutti i Tag</option>
+                                {uniqueTags.map((tag, index) => (
+                                    <option key={index} value={tag}>{tag}</option>
+                                ))}
+                            </select>
+                        </div>
+                    )}
+
+                    <button
+                        className="clear-filters-btn"
+                        onClick={clearFilters}
+                    >
+                        Cancella Filtri
+                    </button>
+                </div>
+            </div>
+
+            <div className="post-list">
+                {filteredPosts.length > 0 ? (
+                    filteredPosts.map(post => (<Post key={post._id} post={post} />))
+                ) : (
+                    <div className="no-posts">
+                        {userFilter || dateFilter || tagFilter
+                            ? "Nessun post corrisponde ai tuoi filtri. Prova con criteri diversi."
+                            : "Nessun post disponibile ancora. Sii il primo a crearne uno!"}
+                    </div>
+                )}
+            </div>
         </div>
     );
 };
