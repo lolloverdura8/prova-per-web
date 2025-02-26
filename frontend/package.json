@@ -10,6 +10,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@fontsource/inter": "^5.1.1",
+    "@fontsource/outfit": "^5.1.1",
     "@mui/material": "^6.4.5",
     "axios": "^1.7.9",
     "react": "^19.0.0",
