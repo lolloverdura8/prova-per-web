@@ -152,6 +152,7 @@ module.exports = {
                 ]
             })
             .populate('author', 'username avatar')
+            .populate('comments.user', 'username avatar')
             .sort({ createdAt: -1 }); // Ordina per i più recenti prima
             
             res.json(posts);
