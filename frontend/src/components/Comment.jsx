@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from 'axios';
-import '../styles/Comments.css';
+import '../styles/Comment.css';
 
 // Comments display component
 const Comments = ({ comments = [] }) => {

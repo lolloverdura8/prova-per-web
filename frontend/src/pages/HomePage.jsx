@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import Sidebar from "../components/SideBar";
 import Navbar from "../components/NavBar";
-import CreatePost from "../components/CreatePost";
+import CreatePost from "../components/NewPost";
 import PostList from "../components/PostList";
 import "../styles/HomePage.css";
 

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from 'axios';
-import { Comments, AddComment } from "./Comments";
+import { Comments, AddComment } from "./Comment";
 import '../styles/Post.css';
 
 const Post = ({ post }) => {
