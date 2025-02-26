@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from 'axios';
+import { FaPencilAlt, FaTimes, FaExclamationCircle, FaPaperPlane } from "react-icons/fa";
 import '../styles/CreatePost.css';
 
 const CreatePost = ({ onPostCreated }) => {
@@ -8,17 +9,23 @@ const CreatePost = ({ onPostCreated }) => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
+    const resetForm = () => {
+        setDescription('');
+        setTags('');
+        setError('');
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!description.trim()) {
-            setError('Post cannot be empty');
+            setError('Il post non può essere vuoto');
             return;
         }
 
         setLoading(true);
         setError('');
 
-        // Process tags
+        // Processa i tag
         const tagArray = tags
             .split(',')
             .map(tag => tag.trim())
@@ -27,7 +34,8 @@ const CreatePost = ({ onPostCreated }) => {
         try {
             const token = localStorage.getItem('token');
             if (!token) {
-                setError('You must be logged in to create a post');
+                setError('Devi essere loggato per creare un post');
+                setLoading(false);
                 return;
             }
 
@@ -37,22 +45,21 @@ const CreatePost = ({ onPostCreated }) => {
             };
 
             const response = await axios.post(
-                'http://localhost:3000/api/posts',
-                postData,
+                'http://localhost:3000/api/posts', 
+                postData, 
                 {
                     headers: { 'Authorization': `Bearer ${token}` }
                 }
             );
-
-            setDescription('');
-            setTags('');
-
+            
+            resetForm();
+            
             if (onPostCreated) {
                 onPostCreated(response.data);
             }
         } catch (error) {
-            console.error('Error creating post: ', error);
-            setError(error.response?.data?.message || 'Failed to create post');
+            console.error('Errore nella creazione del post: ', error);
+            setError(error.response?.data?.message || 'Impossibile creare il post');
         } finally {
             setLoading(false);
         }
@@ -60,32 +67,53 @@ const CreatePost = ({ onPostCreated }) => {
 
     return (
         <div className="create-post">
-            <h3>Create New Post</h3>
+            <h3><FaPencilAlt /> Crea nuovo post</h3>
             <form onSubmit={handleSubmit}>
                 <div className="input-area">
                     <textarea
                         placeholder="Cosa stai pensando?"
                         value={description}
-                        onChange={(e) => setDescription(e.target.value)}
-                        maxLength={1000}
+                        onChange={(e) => setDescription(e.target.value)} 
+                        maxLength={1000} 
                     />
                 </div>
-
+                
                 <div className="input-area tags-input">
-                    <input
-                        type="text"
-                        placeholder="Aggiungi tag (separati da virgola)"
+                    <input 
+                        type="text" 
+                        placeholder="Aggiungi tag (separati da virgola)" 
                         value={tags}
                         onChange={(e) => setTags(e.target.value)}
                     />
                     <small className="helper-text">Esempio: musica, sport, tecnologia</small>
                 </div>
-
-                {error && <p className="error-message">{error}</p>}
-
-                <button type="submit" className="post-button" disabled={loading}>
-                    {loading ? 'Pubblicando...' : 'Pubblica'}
-                </button>
+                
+                {error && (
+                    <p className="error-message">
+                        <FaExclamationCircle /> {error}
+                    </p>
+                )}
+                
+                <div className="post-actions">
+                    <button 
+                        type="button" 
+                        className="cancel-button" 
+                        onClick={resetForm}
+                    >
+                        <FaTimes /> Annulla
+                    </button>
+                    <button 
+                        type="submit" 
+                        className="post-button" 
+                        disabled={loading}
+                    >
+                        {loading ? 'Pubblicando...' : (
+                            <>
+                                <FaPaperPlane /> Pubblica
+                            </>
+                        )}
+                    </button>
+                </div>
             </form>
         </div>
     );

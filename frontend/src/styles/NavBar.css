@@ -1,46 +1,97 @@
 .nav-bar {
     width: 100%;
-    height: 70px;
-    background: rgba(52, 73, 94, 0.8);
-    backdrop-filter: blur(10px);
-    color: white;
+    background-color: var(--bg-elevation-2);
+    color: var(--text-primary);
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 30px;
-    border-radius: 12px;
-    margin-bottom: 20px;
+    padding: var(--spacing-md) var(--spacing-lg);
+    margin-bottom: var(--spacing-lg);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+    position: sticky;
+    top: var(--spacing-sm);
+    z-index: 10;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--border-light);
 }
 
 .nav-bar h2 {
-    font-size: 24px;
+    font-size: var(--font-size-xl);
     font-weight: 600;
     letter-spacing: 0.5px;
+    color: var(--primary-light);
 }
 
 .user-info {
     display: flex;
     align-items: center;
-    gap: 12px;
-    background: rgba(255, 255, 255, 0.1);
-    padding: 8px 16px;
-    border-radius: 30px;
-    transition: all 0.3s ease;
+    gap: var(--spacing-sm);
+    background-color: rgba(255, 255, 255, 0.05);
+    padding: var(--spacing-xs) var(--spacing-md);
+    border-radius: 50px;
+    transition: all var(--transition-normal);
+    border: 1px solid var(--border-light);
 }
 
 .user-info:hover {
-    background: rgba(255, 255, 255, 0.2);
+    background-color: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
 }
 
 .avatar {
-    width: 40px;
-    height: 40px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
-    border: 2px solid rgba(255, 255, 255, 0.2);
+    object-fit: cover;
+    border: 2px solid var(--primary-light);
 }
 
 .username {
-    font-size: 14px;
+    font-size: var(--font-size-sm);
     font-weight: 500;
-    letter-spacing: 0.5px;
+    color: var(--text-primary);
+}
+
+/* Animazione del logo/titolo */
+.nav-bar h2 {
+    position: relative;
+    display: inline-block;
+}
+
+.nav-bar h2::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: -4px;
+    left: 0;
+    background-color: var(--primary-light);
+    transition: width var(--transition-normal);
+}
+
+.nav-bar h2:hover::after {
+    width: 100%;
+}
+
+/* Responsive */
+@media (max-width: 576px) {
+    .nav-bar {
+        padding: var(--spacing-sm) var(--spacing-md);
+        margin-bottom: var(--spacing-md);
+    }
+    
+    .user-info {
+        padding: var(--spacing-xs) var(--spacing-sm);
+    }
+    
+    .avatar {
+        width: 32px;
+        height: 32px;
+    }
+    
+    .username {
+        font-size: var(--font-size-xs);
+    }
 }
