@@ -10,15 +10,15 @@ const Post = ({ post }) => {
                     {author.username}
                 </span>
                 <span className="post-date">
-                    {new Date(createdAt).toLocaleDateString}
+                    {new Date(createdAt).toLocaleDateString()}
                 </span>
-                <div className="post-content">
-                    {description}
-                </div>
-                <div className="post-action">
-                    <button className="action-button">Like</button>
-                    <button className="action-button">Comment</button>
-                </div>
+            </div>
+            <div className="post-content">
+                {description}
+            </div>
+            <div className="post-actions">
+                <button className="action-button">Like</button>
+                <button className="action-button">Comment</button>
             </div>
         </div>
     );

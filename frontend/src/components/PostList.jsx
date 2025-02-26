@@ -4,13 +4,13 @@ import Post from "./Post";
 import '../styles/PostList.css';
 
 const PostList = () => {
-    const [post, setPost] = useState([]);
+    const [posts, setPost] = useState([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchPosts = async () => {
             try {
-                const response = await axios.get('http://0.0.0.0:3000/api/posts');
+                const response = await axios.get('http://localhost:3000/api/posts');
                 setPost(response.data);
             } catch (error) {
                 console.error('Error fetching posts:', error);
@@ -26,7 +26,11 @@ const PostList = () => {
 
     return (
         <div className="post-list">
-            {post.map(post => (<Post key={post._id} post={post} />))}
+            {posts.length > 0 ? (
+                posts.map(post => (<Post key={post._id} post={post} />))
+            ) : (
+                <div className="no-posts">No posts available</div>
+            )}
         </div>
     );
 };
