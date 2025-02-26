@@ -1,0 +1,156 @@
+/* CreatePost.css */
+.create-post {
+    background: rgba(41, 128, 185, 0.15);
+    border-radius: 15px;
+    padding: 25px;
+    margin: 0 0 20px 0;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.create-post h3 {
+    color: white;
+    margin-bottom: 15px;
+    text-align: left;
+}
+
+.input-area {
+    width: 100%;
+    margin-bottom: 15px;
+}
+
+.input-area textarea {
+    width: 100%;
+    min-height: 100px;
+    padding: 15px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    font-size: 16px;
+    resize: vertical;
+}
+
+.input-area textarea:focus {
+    outline: none;
+    border-color: rgba(41, 128, 185, 0.5);
+}
+
+.post-button {
+    background: #3498db;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 30px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    float: right;
+}
+
+.post-button:hover {
+    background: #2980b9;
+    transform: translateY(-2px);
+}
+
+.error-message {
+    color: #e74c3c;
+    margin-top: 10px;
+    text-align: left;
+}
+
+/* Comments.css */
+.comments-section {
+    margin-top: 15px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 15px;
+}
+
+.comments-section h4 {
+    color: white;
+    margin-bottom: 10px;
+    text-align: left;
+}
+
+.comment {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    padding: 12px;
+    margin-bottom: 10px;
+    text-align: left;
+}
+
+.comment-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+}
+
+.comment-author {
+    font-weight: 600;
+    color: white;
+}
+
+.comment-date {
+    font-size: 0.8em;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.comment-content {
+    color: white;
+    font-size: 0.9em;
+}
+
+.add-comment {
+    margin-top: 15px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.add-comment form {
+    display: flex;
+    gap: 10px;
+}
+
+.add-comment input {
+    flex: 1;
+    padding: 10px 15px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+}
+
+.add-comment input:focus {
+    outline: none;
+    border-color: rgba(41, 128, 185, 0.5);
+}
+
+.add-comment button {
+    background: #3498db;
+    color: white;
+    padding: 8px 15px;
+    border-radius: 20px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.add-comment button:hover:not(:disabled) {
+    background: #2980b9;
+}
+
+.add-comment button:disabled {
+    background: rgba(52, 152, 219, 0.5);
+    cursor: not-allowed;
+}
+
+/* Update Post.css for like button state */
+.action-button.liked {
+    background: rgba(231, 76, 60, 0.3);
+}
+
+.comments-container {
+    margin-top: 15px;
+}
