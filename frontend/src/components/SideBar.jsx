@@ -1,11 +1,14 @@
 import React from "react";
-import { FaHome, FaBell, FaUser, FaCog, FaSearch, FaBookmark } from "react-icons/fa";
+import { FaHome, FaBell, FaUser, FaCog, FaSearch, FaBookmark, FaSignOutAlt } from "react-icons/fa";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import UserSettings from "./UserSettings";
 import "../styles/Sidebar.css";
 
 const Sidebar = () => {
     const location = useLocation();
     const navigate = useNavigate();
+    const { logout } = useAuth();
     const path = location.pathname;
     
     const isActive = (route) => {
@@ -14,6 +17,11 @@ const Sidebar = () => {
 
     const navigateTo = (route) => {
         navigate(route);
+    };
+
+    const handleLogout = () => {
+        logout();
+        navigate('/');
     };
 
     return (
@@ -49,8 +57,12 @@ const Sidebar = () => {
                     <FaUser />
                 </div>
                 
-                <div className="icon">
-                    <FaCog />
+                <div className="icon settings-icon">
+                    <UserSettings />
+                </div>
+                
+                <div className="icon logout-icon" onClick={handleLogout}>
+                    <FaSignOutAlt />
                 </div>
             </div>
         </div>

@@ -1,0 +1,170 @@
+.user-settings {
+    position: relative;
+  }
+  
+  .settings-button {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    font-size: var(--font-size-lg);
+    cursor: pointer;
+    transition: color var(--transition-normal);
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+  }
+  
+  .settings-button:hover {
+    color: var(--primary-light);
+    background-color: rgba(187, 134, 252, 0.1);
+  }
+  
+  .settings-panel {
+    position: absolute;
+    left: 100%; /* Posiziona il pannello a DESTRA dell'icona */
+    bottom: 0; /* Allinea il fondo del pannello con il fondo dell'icona */
+    margin-left: 10px; /* Spazio tra l'icona e il pannello */
+    background-color: var(--bg-elevation-2);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    padding: var(--spacing-md);
+    width: 280px;
+    z-index: 100;
+    border: 1px solid var(--border-light);
+    animation: fadeIn 0.2s ease-out;
+    
+    /* Garantisci che l'altezza non sia eccessiva e permetta lo scrolling */
+    max-height: 400px;
+    overflow-y: auto;
+    
+    /* Assicura che il contenuto sia distribuito correttamente */
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* Per layout mobile (con sidebar in basso), posiziona il pannello sopra l'icona */
+  @media (max-width: 576px) {
+    .settings-panel {
+      left: auto; /* Rimuove il posizionamento a sinistra */
+      right: 0; /* Allinea con il bordo destro */
+      bottom: 100%; /* Posiziona sopra l'icona */
+      margin-left: 0;
+      margin-bottom: 10px; /* Spazio tra l'icona e il pannello */
+    }
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateX(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  
+  /* Animazione per mobile */
+  @media (max-width: 576px) {
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  }
+  
+  .settings-panel h3 {
+    color: var(--primary-light);
+    margin-bottom: var(--spacing-md);
+    font-size: var(--font-size-md);
+    padding-bottom: var(--spacing-xs);
+    border-bottom: 1px solid var(--border-light);
+  }
+  
+  .settings-group {
+    margin-bottom: var(--spacing-md);
+  }
+  
+  .settings-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-xs) 0;
+  }
+  
+  .settings-item span {
+    color: var(--text-primary);
+    font-size: var(--font-size-sm);
+  }
+  
+  .icon-button {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    font-size: var(--font-size-md);
+    cursor: pointer;
+    transition: all var(--transition-normal);
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+  }
+  
+  .icon-button:hover {
+    color: var(--primary-light);
+    background-color: rgba(187, 134, 252, 0.1);
+  }
+  
+  .cookie-management {
+    margin-top: var(--spacing-md);
+    padding-top: var(--spacing-md);
+    border-top: 1px solid var(--border-light);
+    /* Assicura che questa sezione non venga compressa */
+    flex-shrink: 0;
+  }
+  
+  .cookie-management h4 {
+    color: var(--primary-light);
+    margin-bottom: var(--spacing-xs);
+    font-size: var(--font-size-sm);
+  }
+  
+  .cookie-management p {
+    color: var(--text-secondary);
+    font-size: var(--font-size-xs);
+    margin-bottom: var(--spacing-md); /* Aumentato spazio prima del pulsante */
+    line-height: 1.5;
+  }
+  
+  .clear-cookies-btn {
+    background-color: var(--bg-elevation-3);
+    border: 1px solid var(--border-light);
+    color: var(--text-primary);
+    padding: var(--spacing-sm); /* Aumentato padding per rendere il pulsante più cliccabile */
+    font-size: var(--font-size-sm); /* Aumentato la dimensione del testo */
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all var(--transition-normal);
+    width: 100%;
+    margin-top: var(--spacing-sm); /* Aggiunto margine sopra il pulsante */
+    font-weight: 500; /* Testo leggermente più in evidenza */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .clear-cookies-btn:hover {
+    border-color: var(--primary-light);
+    background-color: rgba(187, 134, 252, 0.1);
+    color: var(--primary-light);
+  }
