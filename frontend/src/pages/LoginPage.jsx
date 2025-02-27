@@ -38,7 +38,6 @@ const LoginPage = () => {
                     localStorage.setItem('token', result.token);
                     setUser(result.user);
                     navigate('/home')
-                    alert('Login effettuato con successo!');
                 }
             } else {
                 alert(result.message || 'Errore durante l\'operazione');
