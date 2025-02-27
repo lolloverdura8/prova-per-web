@@ -1,58 +1,72 @@
-// /src/pages/LoginPage.jsx
-import React from "react";
-import '../styles/LoginPage.css'
-import "../styles/Global.css"; // Importiamo lo stile globale   
-import AuthForm from "../components/AuthForm";
-import { useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from 'react-router-dom';
+import AuthForm from "../components/AuthForm";
+import CookieBanner from "../components/CookieBanner";
 import { useAuth } from '../context/AuthContext';
+import '../styles/LoginPage.css';
+import "../styles/Global.css";
+
+// Stile specifico della pagina di login per nascondere le impostazioni
+const loginPageStyle = `
+  .settings-button, .settings-icon {
+    display: none !important;
+  }
+`;
 
 const LoginPage = () => {
-    const [isRegister, setIsRegister] = useState(false)
+    const [isRegister, setIsRegister] = useState(false);
+    const [error, setError] = useState("");
     const navigate = useNavigate();
-    const { setUser } = useAuth();
+    const { login, register } = useAuth();
 
     const switchForm = () => {
-        setIsRegister(!isRegister)
-    }
+        setIsRegister(!isRegister);
+        setError("");
+    };
 
     const handleSubmit = async (formData) => {
-        const url = isRegister ? '/register' : '/login';
         try {
-            const response = await fetch(`http://localhost:3000/api/users${url}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(formData),
-            });
-
-            const result = await response.json();
-
-            if (response.ok) {
-                if (isRegister) {
+            if (isRegister) {
+                // Registrazione utente
+                const result = await register(formData);
+                
+                if (result.success) {
                     alert('Registrazione completata con successo!');
                     setIsRegister(false); // Switch to login form
                 } else {
-                    // Store token in localStorage
-                    localStorage.setItem('token', result.token);
-                    setUser(result.user);
-                    navigate('/home')
-                    alert('Login effettuato con successo!');
+                    setError(result.error || 'Errore durante la registrazione');
                 }
             } else {
-                alert(result.message || 'Errore durante l\'operazione');
+                // Login utente
+                const result = await login(formData);
+                
+                if (result.success) {
+                    navigate('/home');
+                } else {
+                    setError(result.error || 'Credenziali non valide');
+                }
             }
         } catch (error) {
             console.error('Errore durante la richiesta:', error);
-            alert('Errore di connessione al server');
+            setError('Errore di connessione al server');
         }
-    }
+    };
 
     return (
-        <div className="login-container">
-            <AuthForm isRegister={isRegister} onToggle={switchForm} onSubmit={handleSubmit} />
-        </div>
+        <>
+            {/* Inietta stile CSS per nascondere le icone delle impostazioni */}
+            <style>{loginPageStyle}</style>
+            
+            <div className="login-container">
+                <AuthForm 
+                    isRegister={isRegister} 
+                    onToggle={switchForm} 
+                    onSubmit={handleSubmit}
+                    error={error} 
+                />
+                <CookieBanner />
+            </div>
+        </>
     );
 };
 

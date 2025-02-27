@@ -3,14 +3,16 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import Sidebar from "../components/SideBar";
 import Navbar from "../components/NavBar";
-import CreatePost from "../components/CreatePost";
 import PostList from "../components/PostList";
+import FloatingActionButton from "../components/FloatingActionButton";
+import PostModal from "../components/PostModal";
 import "../styles/HomePage.css";
 
 const Home = () => {
     const { user } = useAuth();
     const navigate = useNavigate();
     const [refreshPosts, setRefreshPosts] = useState(false);
+    const [isPostModalOpen, setIsPostModalOpen] = useState(false);
 
     useEffect(() => {
         // Redirect to login if not authenticated
@@ -29,16 +31,33 @@ const Home = () => {
         setRefreshPosts(prev => !prev);
     };
 
+    const openPostModal = () => {
+        setIsPostModalOpen(true);
+    };
+
+    const closePostModal = () => {
+        setIsPostModalOpen(false);
+    };
+
     return (
         <div className="home-container">
             <Sidebar />
             <div className="main-content">
                 <Navbar />
                 <div className="content-wrapper">
-                    <CreatePost onPostCreated={handlePostCreated} />
                     <PostList refreshTrigger={refreshPosts} />
                 </div>
             </div>
+            
+            {/* Floating Action Button for creating a new post */}
+            <FloatingActionButton onClick={openPostModal} />
+            
+            {/* Post Creation Modal */}
+            <PostModal 
+                isOpen={isPostModalOpen} 
+                onClose={closePostModal} 
+                onPostCreated={handlePostCreated} 
+            />
         </div>
     );
 };

@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import axios from 'axios';
 import Post from "./Post";
+import Autocomplete from "./AutoComplete";
+import { FaTimes } from "react-icons/fa";
 import '../styles/PostList.css';
 
 const PostList = ({ refreshTrigger }) => {
@@ -83,6 +85,13 @@ const PostList = ({ refreshTrigger }) => {
         setTagFilter('');
     };
 
+    const formatDate = (date) => {
+        if (!date) return '';
+        // Format date as DD/MM/YYYY
+        const d = new Date(date);
+        return `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getFullYear()}`;
+    };
+
     if (loading) return <div className="loading-container">Caricamento post...</div>;
     if (error) return <div className="error-container">{error}</div>;
 
@@ -91,19 +100,14 @@ const PostList = ({ refreshTrigger }) => {
             <div className="filter-container">
                 <h3>Filtra Post</h3>
                 <div className="filter-controls">
-                    <div className="filter-group">
-                        <label htmlFor="user-filter">Per Autore:</label>
-                        <select
-                            id="user-filter"
-                            value={userFilter}
-                            onChange={(e) => setUserFilter(e.target.value)}
-                        >
-                            <option value="">Tutti gli Autori</option>
-                            {uniqueAuthors.map((author, index) => (
-                                <option key={index} value={author}>{author}</option>
-                            ))}
-                        </select>
-                    </div>
+                    <Autocomplete
+                        id="user-filter"
+                        options={uniqueAuthors}
+                        value={userFilter}
+                        onChange={setUserFilter}
+                        placeholder="Cerca un autore..."
+                        label="Per Autore:"
+                    />
 
                     <div className="filter-group">
                         <label htmlFor="date-filter">Per Data:</label>
@@ -115,21 +119,14 @@ const PostList = ({ refreshTrigger }) => {
                         />
                     </div>
 
-                    {uniqueTags.length > 0 && (
-                        <div className="filter-group">
-                            <label htmlFor="tag-filter">Per Tag:</label>
-                            <select
-                                id="tag-filter"
-                                value={tagFilter}
-                                onChange={(e) => setTagFilter(e.target.value)}
-                            >
-                                <option value="">Tutti i Tag</option>
-                                {uniqueTags.map((tag, index) => (
-                                    <option key={index} value={tag}>{tag}</option>
-                                ))}
-                            </select>
-                        </div>
-                    )}
+                    <Autocomplete
+                        id="tag-filter"
+                        options={uniqueTags}
+                        value={tagFilter}
+                        onChange={setTagFilter}
+                        placeholder="Cerca un tag..."
+                        label="Per Tag:"
+                    />
 
                     <button
                         className="clear-filters-btn"

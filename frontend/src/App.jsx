@@ -1,12 +1,21 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import Home from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 import SearchPage from "./pages/SearchPage";
-import './App.css'
+import { getUserPreference, PREFERENCE_TYPES } from "./utils/preferenceUtils";
+import './App.css';
 
 function App() {
+    // Applica il tema salvato nei cookie quando l'app viene caricata
+    useEffect(() => {
+        const savedTheme = getUserPreference(PREFERENCE_TYPES.THEME);
+        if (savedTheme) {
+            document.documentElement.setAttribute('data-theme', savedTheme);
+        }
+    }, []);
+
     return (
         <AuthProvider>
             <Router>

@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import "../styles/AuthForm.css";
 
-const AuthForm = ({ isRegister, onToggle, onSubmit }) => {
+const AuthForm = ({ isRegister, onToggle, onSubmit, error }) => {
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
-    const [error, setError] = useState("");
+    const [formError, setFormError] = useState("");
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -12,21 +12,15 @@ const AuthForm = ({ isRegister, onToggle, onSubmit }) => {
         const username = isRegister ? e.target.username.value : undefined;
 
         if (isRegister && password !== confirmPassword) {
-            setError("Le password non coincidono");
+            setFormError("Le password non coincidono");
             return;
         }
 
-        setError("");
+        setFormError("");
         try {
             await onSubmit({ email, password, username });
         } catch (err) {
-            if (err.message === "User not found") {
-                setError("Nessun account trovato per questa email. Registrati.");
-            } else if (err.message === "Incorrect password") {
-                setError("Password errata. Riprova.");
-            } else {
-                setError("Errore durante l'autenticazione.");
-            }
+            setFormError("Errore durante l'autenticazione.");
         }
     };
 
@@ -63,11 +57,18 @@ const AuthForm = ({ isRegister, onToggle, onSubmit }) => {
                         />
                     </div>
                 )}
-                {error && <p className="error-message">{error}</p>}
+                {(formError || error) && (
+                    <p className="error-message">{formError || error}</p>
+                )}
                 <button type="submit">Invia</button>
                 <a href="#" className="link-login" onClick={onToggle}>
                     {isRegister ? "Hai già un account? Accedi" : "Registrati"}
                 </a>
+                <div className="cookie-info">
+                    <small>
+                        Continuando, accetti la nostra policy sui cookie e privacy.
+                    </small>
+                </div>
             </form>
         </div>
     );

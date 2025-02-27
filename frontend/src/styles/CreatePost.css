@@ -1,34 +1,15 @@
-.create-post {
-    background-color: var(--bg-elevation-1);
-    border-radius: var(--radius-md);
-    padding: var(--spacing-md);
-    margin-bottom: var(--spacing-md);
-    border: 1px solid var(--border-light);
+.create-post-modal {
+    padding: var(--spacing-md) 0;
 }
 
-.create-post h3 {
-    color: var(--primary-light);
-    margin-bottom: var(--spacing-md);
-    text-align: left;
-    font-weight: 500;
-    font-size: var(--font-size-md);
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-sm);
-}
-
-.create-post h3 svg {
-    color: var(--primary-light);
-}
-
-.input-area {
+.create-post-modal .input-area {
     width: 100%;
     margin-bottom: var(--spacing-md);
 }
 
-.input-area textarea {
+.create-post-modal .input-area textarea {
     width: 100%;
-    min-height: 100px;
+    min-height: 120px;
     padding: var(--spacing-md);
     border-radius: var(--radius-sm);
     background-color: var(--bg-elevation-2);
@@ -39,16 +20,16 @@
     transition: border-color var(--transition-normal);
 }
 
-.input-area textarea:focus {
+.create-post-modal .input-area textarea:focus {
     outline: none;
     border-color: var(--primary-light);
 }
 
-.input-area textarea::placeholder {
+.create-post-modal .input-area textarea::placeholder {
     color: var(--text-secondary);
 }
 
-.tags-input input {
+.create-post-modal .tags-input input {
     width: 100%;
     padding: var(--spacing-sm);
     border-radius: var(--radius-sm);
@@ -59,16 +40,16 @@
     transition: border-color var(--transition-normal);
 }
 
-.tags-input input:focus {
+.create-post-modal .tags-input input:focus {
     outline: none;
     border-color: var(--primary-light);
 }
 
-.tags-input input::placeholder {
+.create-post-modal .tags-input input::placeholder {
     color: var(--text-secondary);
 }
 
-.helper-text {
+.create-post-modal .helper-text {
     display: block;
     margin-top: var(--spacing-xs);
     color: var(--text-secondary);
@@ -76,72 +57,41 @@
     font-size: var(--font-size-xs);
 }
 
-.post-actions {
+.create-post-modal .post-actions {
     display: flex;
     justify-content: flex-end;
-    gap: var(--spacing-md);
     margin-top: var(--spacing-md);
 }
 
-.post-button {
+.create-post-modal .post-button {
     background-color: var(--primary);
     color: white;
-    padding: var(--spacing-xs) var(--spacing-md);
+    padding: var(--spacing-sm) var(--spacing-md);
     border-radius: var(--radius-sm);
     font-weight: 500;
     transition: background-color var(--transition-normal);
     display: flex;
     align-items: center;
     gap: var(--spacing-xs);
+    border: none;
 }
 
-.post-button:hover:not(:disabled) {
+.create-post-modal .post-button:hover:not(:disabled) {
     background-color: var(--primary-dark);
 }
 
-.post-button:disabled {
+.create-post-modal .post-button:disabled {
     background-color: var(--bg-elevation-3);
     color: var(--text-disabled);
     cursor: not-allowed;
 }
 
-.cancel-button {
-    background-color: transparent;
-    color: var(--text-secondary);
-    padding: var(--spacing-xs) var(--spacing-md);
-    border-radius: var(--radius-sm);
-    font-weight: 400;
-    transition: color var(--transition-normal);
-    border: 1px solid var(--border-light);
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-xs);
-}
-
-.cancel-button:hover {
-    color: var(--text-primary);
-    border-color: var(--text-secondary);
-}
-
-.error-message {
+.create-post-modal .error-message {
     color: var(--error);
-    margin-top: var(--spacing-sm);
-    margin-bottom: var(--spacing-md);
+    margin: var(--spacing-sm) 0;
     text-align: left;
     font-size: var(--font-size-sm);
     display: flex;
     align-items: center;
     gap: var(--spacing-xs);
-}
-
-@media (max-width: 576px) {
-    .post-actions {
-        flex-direction: column;
-    }
-    
-    .post-button,
-    .cancel-button {
-        width: 100%;
-        justify-content: center;
-    }
 }

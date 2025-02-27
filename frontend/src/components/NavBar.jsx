@@ -10,7 +10,7 @@ const Navbar = () => {
             <h2>Home</h2>
             {user && (
                 <div className="user-info">
-                    <img src={user.avatar || "https://via.placeholder.com/40"} alt="Avatar" className="avatar" />
+                    {/* <img src={user.avatar || "https://via.placeholder.com/40"} alt="Avatar" className="avatar" /> */}
                     <span className="username">{user.username}</span>
                 </div>
             )}

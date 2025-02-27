@@ -1,0 +1,52 @@
+.floating-action-button {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background-color: var(--primary);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow-lg);
+    cursor: pointer;
+    z-index: 100;
+    border: none;
+    transition: all var(--transition-normal);
+    font-size: 20px;
+  }
+  
+  .floating-action-button:hover {
+    background-color: var(--primary-dark);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-xl);
+  }
+  
+  .floating-action-button:active {
+    transform: translateY(0);
+  }
+  
+  /* Animation for button entrance */
+  @keyframes fabEntrance {
+    from {
+      opacity: 0;
+      transform: translateY(20px) scale(0.8);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+  
+  .floating-action-button {
+    animation: fabEntrance 0.3s ease-out;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 576px) {
+    .floating-action-button {
+      bottom: 70px; /* Account for mobile sidebar at bottom */
+    }
+  }

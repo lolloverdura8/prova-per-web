@@ -35,6 +35,7 @@
     min-width: 150px;
     display: flex;
     flex-direction: column;
+    position: relative;
 }
 
 .filter-group label {
@@ -44,7 +45,6 @@
     text-align: left;
 }
 
-.filter-group select,
 .filter-group input {
     padding: var(--spacing-xs) var(--spacing-sm);
     border-radius: var(--radius-sm);
@@ -55,12 +55,46 @@
     transition: border-color var(--transition-normal);
 }
 
-.filter-group select:focus,
 .filter-group input:focus {
     outline: none;
     border-color: var(--primary-light);
 }
 
+/* Autocomplete dropdown */
+.autocomplete-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 10;
+    background: var(--bg-elevation-3);
+    border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+    border: 1px solid var(--border-light);
+    border-top: none;
+    max-height: 200px;
+    overflow-y: auto;
+    box-shadow: var(--shadow-md);
+}
+
+.autocomplete-item {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    text-align: left;
+    color: var(--text-primary);
+}
+
+.autocomplete-item:hover, 
+.autocomplete-item.highlighted {
+    background: var(--primary);
+    color: white;
+}
+
+.autocomplete-item:not(:last-child) {
+    border-bottom: 1px solid var(--border-light);
+}
+
+/* Cambiato il colore del pulsante per cancellare i filtri */
 .clear-filters-btn {
     background-color: transparent;
     border: 1px solid var(--border-light);
@@ -76,6 +110,7 @@
 .clear-filters-btn:hover {
     border-color: var(--primary-light);
     color: var(--primary-light);
+    background-color: rgba(187, 134, 252, 0.1);
 }
 
 .loading-container,
@@ -93,6 +128,32 @@
 .error-container {
     border-color: var(--error);
     color: var(--error);
+}
+
+/* Tags selected container */
+.selected-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-xs);
+    margin-top: var(--spacing-xs);
+}
+
+.tag-pill {
+    background-color: var(--primary-variant);
+    color: white;
+    border-radius: 50px;
+    padding: 2px 10px;
+    font-size: var(--font-size-xs);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.tag-pill .remove-tag {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 /* Animazioni */
