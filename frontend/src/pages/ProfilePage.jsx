@@ -1,5 +1,5 @@
-import React, { useEffect, useState, useRef } from "react";
-// Importa React e gli hook useEffect, useState e useRef
+import React, { useEffect, useState } from "react";
+// Importa React e gli hook useEffect e useState
 
 import { useNavigate } from "react-router-dom";
 // Importa useNavigate per la navigazione programmatica
@@ -19,7 +19,7 @@ import Navbar from "../components/NavBar";
 import Post from "../components/Post";
 // Importa il componente per visualizzare un singolo post
 
-import { FaCamera, FaEdit, FaCheck, FaTimes } from "react-icons/fa";
+import { FaEdit, FaCheck, FaTimes } from "react-icons/fa";
 // Importa le icone da react-icons
 
 import "../styles/ProfilePage.css";
@@ -42,12 +42,6 @@ const ProfilePage = () => {
 
     const [error, setError] = useState('');
     // Stato per memorizzare eventuali errori
-
-    const [uploading, setUploading] = useState(false);
-    // Stato per tenere traccia del caricamento dell'avatar
-
-    const fileInputRef = useRef(null);
-    // Riferimento per l'input file nascosto
 
     const [editMode, setEditMode] = useState(false);
     // Stato per gestire la modalità di modifica del profilo
@@ -133,61 +127,6 @@ const ProfilePage = () => {
     }, [user]);
     // L'effetto si riattiva quando l'utente cambia
 
-    // Gestisce il click sul pulsante di caricamento avatar
-    const handleAvatarButtonClick = () => {
-        // Attiva il click sull'input file nascosto
-        fileInputRef.current.click();
-    };
-
-    // Gestisce il caricamento dell'avatar
-    const handleAvatarUpload = async (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        // Verifica il tipo di file
-        const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-        if (!allowedTypes.includes(file.type)) {
-            setError('Formato file non supportato. Utilizzare JPEG, PNG, GIF o WEBP.');
-            return;
-        }
-
-        // Verifica la dimensione del file (max 5MB)
-        if (file.size > 5 * 1024 * 1024) {
-            setError('Il file è troppo grande. Dimensione massima: 5MB.');
-            return;
-        }
-
-        setUploading(true);
-        setError('');
-
-        try {
-            const formData = new FormData();
-            formData.append('avatar', file);
-
-            const token = localStorage.getItem('token');
-            const response = await axios.post(
-                'http://localhost:3000/api/uploads/avatar',
-                formData,
-                {
-                    headers: {
-                        'Content-Type': 'multipart/form-data',
-                        'Authorization': `Bearer ${token}`
-                    }
-                }
-            );
-
-            // Aggiorna l'utente nel contesto di autenticazione
-            if (response.data.user) {
-                setUser(response.data.user);
-            }
-        } catch (error) {
-            console.error('Error uploading avatar:', error);
-            setError('Errore durante il caricamento dell\'avatar. Riprova più tardi.');
-        } finally {
-            setUploading(false);
-        }
-    };
-
     // Gestisce l'attivazione della modalità di modifica
     const handleEditProfileClick = () => {
         setEditMode(true);
@@ -264,39 +203,12 @@ const ProfilePage = () => {
                     <div className="profile-info">
                         {/* Colonna di sinistra con le informazioni dell'utente */}
 
-                        <div className="avatar-container">
-                            {/* Contenitore per l'avatar e pulsante di caricamento */}
-
-                            <div className="profile-avatar">
-                                {/* Avatar dell'utente */}
-                                <img
-                                    src={user?.avatar || '/path/to/default-avatar.png'}
-                                    alt={`Avatar di ${user?.username}`}
-                                    className="avatar-image"
-                                />
-
-                                {uploading && (
-                                    <div className="avatar-loading">
-                                        <div className="spinner"></div>
-                                    </div>
-                                )}
-                            </div>
-
-                            <button
-                                className="avatar-upload-btn"
-                                onClick={handleAvatarButtonClick}
-                                disabled={uploading}
-                                aria-label="Cambia avatar"
-                            >
-                                <FaCamera />
-                            </button>
-
-                            <input
-                                type="file"
-                                ref={fileInputRef}
-                                onChange={handleAvatarUpload}
-                                accept="image/jpeg,image/png,image/gif,image/webp"
-                                style={{ display: 'none' }}
+                        <div className="profile-avatar">
+                            {/* Avatar dell'utente */}
+                            <img
+                                src={user?.avatar || '/path/to/default-avatar.png'}
+                                alt={`Avatar di ${user?.username}`}
+                                className="avatar-image"
                             />
                         </div>
 
