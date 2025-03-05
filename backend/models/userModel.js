@@ -4,18 +4,17 @@ const bcrypt = require('bcryptjs');
 const UserSchema = mongoose.Schema({
     username: { type: String, required: true, unique: true },
     email: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
-    avatar: {
-        data: Buffer,  // Dati binari dell'immagine
-        contentType: String,  // Tipo MIME dell'immagine
-        default: null
-    }
+    password: { type: String, required: true }
 }, { timestamps: true });
 
 // Hash password prima del salvataggio
 UserSchema.pre('save', async function (next) {
+    // Se la password non è stata modificata, passa al middleware successivo
     if (!this.isModified('password')) return next();
+
+    // Genera un hash della password con fattore di costo 10
     this.password = await bcrypt.hash(this.password, 10);
+
     next();
 });
 

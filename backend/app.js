@@ -10,24 +10,11 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 // Importa CORS (Cross-Origin Resource Sharing) per gestire le richieste da domini diversi
 
-const path = require("path");
-// Importa path per gestire i percorsi dei file
-
-//const http = require('http');
-//const { Server } = require('socket.io');
-// Codice commentato per futura implementazione di WebSocket con Socket.io
-
 const userRoutes = require("./routes/usersRoutes");
 // Importa le rotte per la gestione degli utenti
 
 const postRoutes = require("./routes/postRoutes");
 // Importa le rotte per la gestione dei post
-
-const uploadRoutes = require("./routes/uploadRoutes");
-// Importa le rotte per la gestione degli upload
-
-const uploadController = require("./controllers/uploadController");
-// Importa il controller per inizializzare la directory di upload
 
 const app = express();
 // Inizializza l'applicazione Express
@@ -45,17 +32,11 @@ app.use(
 );
 // Abilita CORS con le opzioni specificate
 
-// Inizializza la directory di upload
-uploadController.initializeUploadDir();
-
 app.use("/api/users", userRoutes);
 // Collega le rotte degli utenti al percorso /api/users
 
 app.use("/api/posts", postRoutes);
 // Collega le rotte dei post al percorso /api/posts
-
-app.use("/api/uploads", uploadRoutes);
-// Collega le rotte degli upload al percorso /api/uploads
 
 mongoose
     .connect(process.env.MONGODB_URI)
@@ -64,21 +45,6 @@ mongoose
     // Se la connessione ha successo, stampa un messaggio di conferma
     .catch((err) => console.error("MongoDB connection error:", err));
 // Se la connessione fallisce, stampa l'errore
-
-/* WebSocket da implementare più tardi
-const server = http.createServer(app);
-const io = new Server(server, {
-    cors: {
-        origin: "http://localhost:5173",
-        methods: ["GET", "POST"]
-    }
-});
-
-io.on('connection', (socket) => {
-    console.log('Client connected');
-});
-*/
-// Codice commentato per la futura implementazione di WebSocket
 
 const PORT = process.env.PORT || 3000;
 // Definisce la porta su cui il server ascolterà, usando quella specificata nelle variabili d'ambiente o 3000 come fallback
