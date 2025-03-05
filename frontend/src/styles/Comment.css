@@ -25,6 +25,21 @@
     display: flex;
     justify-content: space-between;
     margin-bottom: var(--spacing-xs);
+    align-items: center;
+}
+
+.comment-author-info {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+}
+
+.comment-avatar {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid var(--primary-light);
 }
 
 .comment-author {
@@ -41,6 +56,8 @@
 .comment-content {
     color: var(--text-primary);
     font-size: var(--font-size-sm);
+    margin-left: 32px;
+    /* Allinea con l'avatar */
 }
 
 .add-comment {
@@ -50,10 +67,12 @@
 .add-comment form {
     display: flex;
     gap: var(--spacing-sm);
+    flex-wrap: wrap;
 }
 
 .add-comment input {
     flex: 1;
+    min-width: 200px;
     padding: var(--spacing-sm);
     border-radius: var(--radius-sm);
     background: var(--bg-elevation-2);
@@ -93,4 +112,5 @@
     color: var(--error);
     font-size: var(--font-size-sm);
     margin: var(--spacing-xs) 0;
+    flex-basis: 100%;
 }

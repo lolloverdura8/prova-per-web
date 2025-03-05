@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-// Importa React e il hook useEffect
+// Importa React e l'hook useEffect
 
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 // Importa i componenti per il routing dalla libreria react-router-dom
@@ -15,6 +15,9 @@ import LoginPage from "./pages/LoginPage";
 
 import SearchPage from "./pages/SearchPage";
 // Importa il componente della pagina di Ricerca
+
+import ProfilePage from "./pages/ProfilePage";
+// Importa il componente della nuova pagina del profilo
 
 import { getUserPreference, PREFERENCE_TYPES } from "./utils/preferenceUtils";
 // Importa le utility per gestire le preferenze utente
@@ -59,6 +62,9 @@ function App() {
 
                     <Route path="/search" element={<SearchPage />} />
                     {/* Rotta per la pagina di ricerca */}
+
+                    <Route path="/profile" element={<ProfilePage />} />
+                    {/* Rotta per la nuova pagina del profilo utente */}
                 </Routes>
             </Router>
         </AuthProvider>

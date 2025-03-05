@@ -69,7 +69,10 @@ const Sidebar = () => {
                 // Classe condizionale: aggiunge 'active' se la rotta corrente è '/home'
 
                 onClick={() => navigateTo('/home')}
-            // Al click, naviga alla pagina home
+                // Al click, naviga alla pagina home
+
+                title="Home"
+            // Tooltip che appare al passaggio del mouse
             >
                 <FaHome />
                 {/* Icona home */}
@@ -80,26 +83,38 @@ const Sidebar = () => {
                 // Classe condizionale: aggiunge 'active' se la rotta corrente è '/search'
 
                 onClick={() => navigateTo('/search')}
-            // Al click, naviga alla pagina di ricerca
+                // Al click, naviga alla pagina di ricerca
+
+                title="Cerca"
+            // Tooltip che appare al passaggio del mouse
             >
                 <FaSearch />
                 {/* Icona ricerca */}
             </div>
 
             <div className="icon">
-                <FaBell />
+                <FaBell title="Notifiche" />
                 {/* Icona notifiche (funzionalità non implementata) */}
             </div>
 
             <div className="icon">
-                <FaBookmark />
+                <FaBookmark title="Salvati" />
                 {/* Icona segnalibri (funzionalità non implementata) */}
             </div>
 
             <div className="sidebar-bottom">
                 {/* Sezione inferiore della sidebar con icone per profilo, impostazioni e logout */}
 
-                <div className="icon">
+                <div
+                    className={`icon ${isActive('/profile') ? 'active' : ''}`}
+                    // Classe condizionale: aggiunge 'active' se la rotta corrente è '/profile'
+
+                    onClick={() => navigateTo('/profile')}
+                    // Al click, naviga alla pagina del profilo
+
+                    title="Profilo"
+                // Tooltip che appare al passaggio del mouse
+                >
                     <FaUser />
                     {/* Icona profilo utente */}
                 </div>
@@ -109,9 +124,12 @@ const Sidebar = () => {
                     {/* Componente per le impostazioni utente */}
                 </div>
 
-                <div className="icon logout-icon" onClick={handleLogout}>
-                    {/* Icona per il logout, con evento click collegato a handleLogout */}
-
+                <div
+                    className="icon logout-icon"
+                    onClick={handleLogout}
+                    title="Esci"
+                // Tooltip che appare al passaggio del mouse
+                >
                     <FaSignOutAlt />
                     {/* Icona logout */}
                 </div>

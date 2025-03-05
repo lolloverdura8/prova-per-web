@@ -135,10 +135,19 @@ const Post = ({ post }) => {
             <div className="post-header">
                 {/* Intestazione del post con autore e data */}
 
-                <span className="post-author">
-                    {author?.username || 'Unknown User'}
-                    {/* Mostra il nome utente dell'autore o "Unknown User" se non disponibile */}
-                </span>
+                <div className="post-author-info">
+                    {/* Contenitore per informazioni sull'autore con avatar */}
+
+                    <img
+                        src={user?.avatar || '/path/to/default-avatar.png'}
+                        alt={`Avatar di ${user?.username}`}
+                        className="avatar-image"
+                    />
+                    <span className="post-author">
+                        {author?.username || 'Utente Sconosciuto'}
+                        {/* Mostra il nome utente dell'autore o "Utente Sconosciuto" se non disponibile */}
+                    </span>
+                </div>
 
                 <span className="post-date">
                     {formatDate(createdAt)}

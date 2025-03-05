@@ -12,7 +12,14 @@ const Comments = ({ comments = [] }) => {
             {comments.map((comment, index) => (
                 <div key={index} className="comment">
                     <div className="comment-header">
-                        <span className="comment-author">{comment.user.username}</span>
+                        <div className="comment-author-info">
+                            <img
+                                src={user?.avatar || '/path/to/default-avatar.png'}
+                                alt={`Avatar di ${user?.username}`}
+                                className="avatar-image"
+                            />
+                            <span className="comment-author">{comment.user?.username}</span>
+                        </div>
                         <span className="comment-date">
                             {new Date(comment.createdAt).toLocaleDateString()}
                         </span>

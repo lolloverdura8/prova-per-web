@@ -133,17 +133,17 @@ module.exports = {
     },
 
     // Ricerca post per contenuto
-    searchPosts : async (req, res) => {
+    searchPosts: async (req, res) => {
         try {
             const { query } = req.query;
-            
+
             if (!query) {
                 return res.status(400).json({ message: "Parametro di ricerca mancante" });
             }
-            
+
             // Crea un'espressione regolare case-insensitive per la ricerca
             const searchRegex = new RegExp(query, 'i');
-            
+
             // Cerca nei post per descrizione o tag che corrispondono alla query
             const posts = await Post.find({
                 $or: [
@@ -151,14 +151,96 @@ module.exports = {
                     { tags: { $in: [searchRegex] } }
                 ]
             })
-            .populate('author', 'username avatar')
-            .populate('comments.user', 'username avatar')
-            .sort({ createdAt: -1 }); // Ordina per i più recenti prima
-            
+                .populate('author', 'username avatar')
+                .populate('comments.user', 'username avatar')
+                .sort({ createdAt: -1 }); // Ordina per i più recenti prima
+
             res.json(posts);
         } catch (error) {
             console.error("Errore durante la ricerca:", error);
             res.status(500).json({ message: "Errore del server durante la ricerca" });
         }
     },
+
+    // Versione corretta del controller
+    getFilteredPosts: async (req, res) => {
+        try {
+            const { author, date, tag } = req.query;
+
+            console.log("Parametri di filtro ricevuti:", { author, date, tag });
+
+            // Verifica che il modello Post sia importato correttamente
+            const Post = require("../models/postModel");
+
+            // Costruisci l'oggetto query in base ai filtri forniti
+            const query = {};
+
+            if (author) {
+                try {
+                    // Cerca l'utente per username
+                    const User = require("../models/userModel");
+                    const user = await User.findOne({ username: author });
+
+                    if (user) {
+                        query.author = user._id;
+                    } else {
+                        // Se l'utente non viene trovato, restituisci un array vuoto
+                        console.log(`Autore "${author}" non trovato`);
+                        return res.json([]);
+                    }
+                } catch (userError) {
+                    console.error("Errore nel cercare l'utente:", userError);
+                    // Non interrompere il flusso, continua con gli altri filtri
+                }
+            }
+
+            if (date) {
+                try {
+                    // Filtra per data (consideriamo l'intera giornata)
+                    const startDate = new Date(date);
+                    startDate.setHours(0, 0, 0, 0);
+
+                    const endDate = new Date(date);
+                    endDate.setHours(23, 59, 59, 999);
+
+                    query.createdAt = { $gte: startDate, $lte: endDate };
+                } catch (dateError) {
+                    console.error("Errore nel processare la data:", dateError);
+                    // Non interrompere il flusso, continua con gli altri filtri
+                }
+            }
+
+            if (tag) {
+                // Filtra per tag (esatta corrispondenza)
+                query.tags = tag;
+            }
+
+            console.log("Query MongoDB:", JSON.stringify(query));
+
+            // Esegui la query con gestione degli errori
+            let posts = [];
+            try {
+                posts = await Post.find(query)
+                    .populate('author', 'username')
+                    .populate('comments.user', 'username')
+                    .sort({ createdAt: -1 });
+
+                console.log(`Trovati ${posts.length} post`);
+            } catch (queryError) {
+                console.error("Errore nella query:", queryError);
+                return res.status(500).json({
+                    error: "Errore durante l'esecuzione della query",
+                    details: queryError.message
+                });
+            }
+
+            return res.json(posts);
+        } catch (err) {
+            console.error("Errore durante il filtraggio dei post:", err);
+            return res.status(500).json({
+                error: "Errore interno del server",
+                details: err.message
+            });
+        }
+    }
 };

@@ -21,10 +21,15 @@ module.exports = {
             if (!user || !(await bcrypt.compare(password, user.password))) {
                 return res.status(400).json({ message: "Credenziali errate" });
             }
+
+            // Rimuovi la password dall'oggetto utente
+            const userObj = user.toObject();
+            delete userObj.password;
+
             const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
                 expiresIn: "1h",
             });
-            res.json({ token, user });
+            res.json({ token, user: userObj });
         } catch (err) {
             res.status(500).json({ error: err.message });
         }
@@ -38,9 +43,10 @@ module.exports = {
             res.status(500).json({ message: error.message });
         }
     },
+
     getProfile: async (req, res) => {
         try {
-            const user = await User.findById(req.user.id).select('-password'); // Get user data without password
+            const user = await User.findById(req.user.id).select('-password');
             if (!user) {
                 return res.status(404).json({ message: 'Utente non trovato' });
             }
@@ -49,4 +55,34 @@ module.exports = {
             res.status(500).json({ error: err.message });
         }
     },
+
+    updateProfile: async (req, res) => {
+        try {
+            // Campi consentiti per l'aggiornamento
+            const { username, email } = req.body;
+            const updateData = {};
+
+            if (username) updateData.username = username;
+            if (email) updateData.email = email;
+
+            // Se non ci sono dati da aggiornare
+            if (Object.keys(updateData).length === 0) {
+                return res.status(400).json({ message: "Nessun dato da aggiornare" });
+            }
+
+            const user = await User.findByIdAndUpdate(
+                req.user.id,
+                updateData,
+                { new: true }
+            ).select('-password');
+
+            if (!user) {
+                return res.status(404).json({ message: "Utente non trovato" });
+            }
+
+            res.json(user);
+        } catch (err) {
+            res.status(500).json({ error: err.message });
+        }
+    }
 };

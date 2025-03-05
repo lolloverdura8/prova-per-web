@@ -41,121 +41,194 @@ const PostList = ({ refreshTrigger }) => {
     const [tagFilter, setTagFilter] = useState('');
     // Stato per il filtro per tag
 
-    // Get unique authors from posts
-    const uniqueAuthors = [...new Set(posts.map(post => post.author?.username).filter(Boolean))];
-    // Crea un array di autori unici estraendo i nomi utente dagli autori dei post
-    // Set garantisce valori unici, filter(Boolean) rimuove valori null o undefined
+    // Opzioni per l'autocomplete (ora caricate dal server)
+    const [uniqueAuthors, setUniqueAuthors] = useState([]);
+    // Stato per memorizzare gli autori unici per le opzioni dell'autocomplete
 
-    // Get unique tags from posts
-    const uniqueTags = [...new Set(posts.flatMap(post => post.tags || []).filter(Boolean))];
-    // Crea un array di tag unici estraendo i tag da tutti i post
-    // flatMap appiattisce l'array di array in un unico array, Set garantisce valori unici
+    const [uniqueTags, setUniqueTags] = useState([]);
+    // Stato per memorizzare i tag unici per le opzioni dell'autocomplete
 
+    // Carica tutti i post senza filtri
+    const fetchPosts = async () => {
+        // Funzione asincrona per recuperare tutti i post dal server
+
+        setLoading(true);
+        // Imposta lo stato di caricamento
+
+        setError('');
+        // Resetta eventuali errori precedenti
+
+        try {
+            // Tenta di eseguire la richiesta
+
+            const response = await axios.get('http://localhost:3000/api/posts');
+            // Invia una richiesta GET all'endpoint dei post
+
+            if (response.data) {
+                // Se la risposta contiene dati
+
+                setPosts(response.data);
+                // Aggiorna lo stato dei post con i dati ricevuti
+
+                setFilteredPosts(response.data);
+                // Inizialmente, i post filtrati sono gli stessi di tutti i post
+
+                // Estrai autori e tag unici per i filtri
+                const authors = [...new Set(response.data
+                    .map(post => post.author?.username)
+                    .filter(Boolean))];
+                // Estrae gli autori unici dai post
+
+                setUniqueAuthors(authors);
+                // Aggiorna lo stato degli autori unici
+
+                const tags = [...new Set(response.data
+                    .flatMap(post => post.tags || [])
+                    .filter(Boolean))];
+                // Estrae i tag unici dai post
+
+                setUniqueTags(tags);
+                // Aggiorna lo stato dei tag unici
+            } else {
+                // Se la risposta non contiene dati
+
+                setError('No posts found');
+                // Imposta un messaggio di errore
+            }
+        } catch (error) {
+            // Se la richiesta fallisce
+
+            console.error('Error fetching posts:', error);
+            // Logga l'errore nella console
+
+            setError('Failed to load posts. Please try again later.');
+            // Imposta un messaggio di errore per l'utente
+        } finally {
+            setLoading(false);
+            // Termina lo stato di caricamento indipendentemente dal risultato
+        }
+    };
+
+    // Carica post filtrati dal server
+    const fetchFilteredPosts = async () => {
+        // Funzione asincrona per recuperare i post filtrati dal server
+
+        setLoading(true);
+        // Imposta lo stato di caricamento
+
+        setError('');
+        // Resetta eventuali errori precedenti
+
+        try {
+            // Tenta di eseguire la richiesta
+
+            // Costruisci l'URL con i parametri di query in base ai filtri attivi
+            let url = 'http://localhost:3000/api/posts/filter';
+            // URL base per l'endpoint di filtro
+
+            const params = new URLSearchParams();
+            // Crea un oggetto URLSearchParams per costruire i parametri della query
+
+            if (userFilter) params.append('author', userFilter);
+            // Se c'è un filtro utente, aggiungilo ai parametri
+
+            if (dateFilter) params.append('date', dateFilter);
+            // Se c'è un filtro data, aggiungilo ai parametri
+
+            if (tagFilter) params.append('tag', tagFilter);
+            // Se c'è un filtro tag, aggiungilo ai parametri
+
+            // Aggiungi i parametri all'URL solo se ce ne sono
+            const queryString = params.toString();
+            // Converte i parametri in una stringa di query
+
+            if (queryString) {
+                url += '?' + queryString;
+                // Aggiunge la stringa di query all'URL
+            }
+
+            console.log("Invio richiesta filtrata a:", url);
+            // Logga l'URL per debug
+
+            const response = await axios.get(url);
+            // Invia una richiesta GET all'URL con i filtri
+
+            console.log("Risposta dal server:", response.data);
+            // Logga la risposta per debug
+
+            if (response.data) {
+                // Se la risposta contiene dati
+
+                setFilteredPosts(response.data);
+                // Aggiorna lo stato dei post filtrati
+
+                if (response.data.length === 0) {
+                    // Se non ci sono risultati
+
+                    // Non è un errore, solo nessun risultato
+                    console.log("Nessun post corrisponde ai filtri");
+                    // Logga un messaggio per debug
+                }
+            } else {
+                // Se la risposta non contiene dati
+
+                setFilteredPosts([]);
+                // Imposta un array vuoto
+
+                setError('Nessun post trovato');
+                // Imposta un messaggio di errore
+            }
+        } catch (error) {
+            // Se la richiesta fallisce
+
+            console.error('Error fetching filtered posts:', error);
+            // Logga l'errore nella console
+
+            setError(`Impossibile caricare i post filtrati: ${error.message}`);
+            // Imposta un messaggio di errore dettagliato
+
+            setFilteredPosts([]);
+            // Resetta i post filtrati
+        } finally {
+            setLoading(false);
+            // Termina lo stato di caricamento indipendentemente dal risultato
+        }
+    };
+
+    // Carica i post quando il componente si monta o il trigger di aggiornamento cambia
     useEffect(() => {
         // Effetto che si attiva quando il componente si monta o refreshTrigger cambia
 
-        const fetchPosts = async () => {
-            // Funzione asincrona per recuperare i post dal server
-
-            setLoading(true);
-            // Imposta lo stato di caricamento
-
-            setError('');
-            // Resetta eventuali errori precedenti
-
-            try {
-                // Tenta di eseguire la richiesta
-
-                const response = await axios.get('http://localhost:3000/api/posts');
-                // Invia una richiesta GET all'endpoint dei post
-
-                if (response.data) {
-                    // Se la risposta contiene dati
-
-                    setPosts(response.data);
-                    // Aggiorna lo stato dei post con i dati ricevuti
-
-                    setFilteredPosts(response.data);
-                    // Inizialmente, i post filtrati sono gli stessi di tutti i post
-                } else {
-                    // Se la risposta non contiene dati
-
-                    setError('No posts found');
-                    // Imposta un messaggio di errore
-                }
-            } catch (error) {
-                // Se la richiesta fallisce
-
-                console.error('Error fetching posts:', error);
-                // Logga l'errore nella console
-
-                setError('Failed to load posts. Please try again later.');
-                // Imposta un messaggio di errore per l'utente
-            } finally {
-                setLoading(false);
-                // Termina lo stato di caricamento indipendentemente dal risultato
-            }
-        };
-
         fetchPosts();
-        // Chiama la funzione per recuperare i post
+        // Chiama la funzione per recuperare tutti i post
     }, [refreshTrigger]);
     // L'effetto si riattiva quando refreshTrigger cambia
 
-    // Apply filters whenever filter states or posts change
+    // Applica i filtri (ora chiama il backend invece di filtrare localmente)
     useEffect(() => {
-        // Effetto che si attiva quando i filtri o i post cambiano
+        // Effetto che si attiva quando cambiano i filtri o posts.length
 
-        let result = [...posts];
-        // Inizia con una copia di tutti i post
+        // Se non ci sono filtri attivi, mostra tutti i post
+        if (!userFilter && !dateFilter && !tagFilter) {
+            // Se non c'è nessun filtro attivo
 
-        // Filter by user
-        if (userFilter) {
-            // Se è attivo il filtro per utente
+            setFilteredPosts(posts);
+            // Usa tutti i post (nessun filtro)
 
-            result = result.filter(post =>
-                post.author?.username?.toLowerCase() === userFilter.toLowerCase()
-                // Filtra i post dove il nome utente dell'autore corrisponde al filtro
-                // toLowerCase() rende il filtro case-insensitive
-            );
+            console.log("Nessun filtro attivo, mostro tutti i post");
+            // Logga un messaggio per debug
+        } else {
+            // Se c'è almeno un filtro attivo
+
+            // Altrimenti, richiedi i post filtrati dal server
+            console.log("Filtri attivi, richiedo post filtrati");
+            // Logga un messaggio per debug
+
+            fetchFilteredPosts();
+            // Chiama la funzione per recuperare i post filtrati
         }
-
-        // Filter by date
-        if (dateFilter) {
-            // Se è attivo il filtro per data
-
-            const filterDate = new Date(dateFilter);
-            // Converte la stringa in un oggetto Date
-
-            result = result.filter(post => {
-                // Filtra i post in base alla data
-
-                const postDate = new Date(post.createdAt);
-                // Converte la data del post in un oggetto Date
-
-                return (
-                    postDate.getFullYear() === filterDate.getFullYear() &&
-                    postDate.getMonth() === filterDate.getMonth() &&
-                    postDate.getDate() === filterDate.getDate()
-                    // Confronta anno, mese e giorno per trovare i post della stessa data
-                );
-            });
-        }
-
-        // Filter by tag
-        if (tagFilter) {
-            // Se è attivo il filtro per tag
-
-            result = result.filter(post =>
-                post.tags && post.tags.includes(tagFilter)
-                // Filtra i post che contengono il tag selezionato
-            );
-        }
-
-        setFilteredPosts(result);
-        // Aggiorna lo stato dei post filtrati
-    }, [posts, userFilter, dateFilter, tagFilter]);
-    // L'effetto si riattiva quando i post o qualsiasi filtro cambiano
+    }, [userFilter, dateFilter, tagFilter, posts.length]);
+    // L'effetto si riattiva quando cambia uno qualsiasi dei filtri o il numero di post
 
     const clearFilters = () => {
         // Funzione per cancellare tutti i filtri
@@ -170,25 +243,11 @@ const PostList = ({ refreshTrigger }) => {
         // Resetta il filtro tag
     };
 
-    const formatDate = (date) => {
-        // Funzione per formattare la data
+    if (loading && filteredPosts.length === 0) return <div className="loading-container">Caricamento post...</div>;
+    // Se sta caricando e non ci sono post da mostrare, mostra un indicatore di caricamento
 
-        if (!date) return '';
-        // Se la data è null/undefined, ritorna stringa vuota
-
-        // Format date as DD/MM/YYYY
-        const d = new Date(date);
-        // Converte in oggetto Date
-
-        return `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getFullYear()}`;
-        // Formatta come DD/MM/YYYY con padding zero per giorni e mesi
-    };
-
-    if (loading) return <div className="loading-container">Caricamento post...</div>;
-    // Se sta caricando, mostra un indicatore di caricamento
-
-    if (error) return <div className="error-container">{error}</div>;
-    // Se c'è un errore, mostra il messaggio di errore
+    if (error && filteredPosts.length === 0) return <div className="error-container">{error}</div>;
+    // Se c'è un errore e non ci sono post da mostrare, mostra il messaggio di errore
 
     return (
         <div className="post-list-container">

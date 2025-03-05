@@ -10,6 +10,9 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 // Importa CORS (Cross-Origin Resource Sharing) per gestire le richieste da domini diversi
 
+const path = require("path");
+// Importa path per gestire i percorsi dei file
+
 //const http = require('http');
 //const { Server } = require('socket.io');
 // Codice commentato per futura implementazione di WebSocket con Socket.io
@@ -19,6 +22,12 @@ const userRoutes = require("./routes/usersRoutes");
 
 const postRoutes = require("./routes/postRoutes");
 // Importa le rotte per la gestione dei post
+
+const uploadRoutes = require("./routes/uploadRoutes");
+// Importa le rotte per la gestione degli upload
+
+const uploadController = require("./controllers/uploadController");
+// Importa il controller per inizializzare la directory di upload
 
 const app = express();
 // Inizializza l'applicazione Express
@@ -36,11 +45,17 @@ app.use(
 );
 // Abilita CORS con le opzioni specificate
 
+// Inizializza la directory di upload
+uploadController.initializeUploadDir();
+
 app.use("/api/users", userRoutes);
 // Collega le rotte degli utenti al percorso /api/users
 
 app.use("/api/posts", postRoutes);
 // Collega le rotte dei post al percorso /api/posts
+
+app.use("/api/uploads", uploadRoutes);
+// Collega le rotte degli upload al percorso /api/uploads
 
 mongoose
     .connect(process.env.MONGODB_URI)

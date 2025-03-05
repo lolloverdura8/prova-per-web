@@ -58,7 +58,16 @@ export const AuthProvider = ({ children }) => {
                     }
                 });
 
-                setUser(response.data);
+                // Trasforma la risposta per includere l'URL dell'avatar
+                const userData = response.data;
+                if (userData && userData._id) {
+                    // Se l'utente ha un avatar, crea l'URL per accedervi
+                    userData.avatarUrl = userData._id ?
+                        `http://localhost:3000/api/users/avatar/${userData._id}` :
+                        null;
+                }
+
+                setUser(userData);
                 // Imposta user con i dati dell'utente ricevuti dal server
 
                 // Sincronizza il token tra cookie e localStorage se necessario
@@ -104,6 +113,11 @@ export const AuthProvider = ({ children }) => {
 
             const { token, user } = response.data;
             // Estrae token e dati utente dalla risposta
+
+            // Aggiungi l'URL dell'avatar ai dati dell'utente
+            if (user && user._id) {
+                user.avatarUrl = `http://localhost:3000/api/users/avatar/${user._id}`;
+            }
 
             // Salva il token sia nei cookie che nel localStorage per compatibilità
             authCookies.setAuthToken(token);
@@ -168,14 +182,95 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
+    // Funzione per aggiornare l'avatar dell'utente
+    const uploadAvatar = async (file) => {
+        try {
+            const token = localStorage.getItem('token');
+            if (!token) return { success: false, error: "Non autenticato" };
+
+            const formData = new FormData();
+            formData.append('avatar', file);
+
+            const response = await axios.post(
+                'http://localhost:3000/api/users/avatar',
+                formData,
+                {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                        'Authorization': `Bearer ${token}`
+                    }
+                }
+            );
+
+            // Aggiorna l'utente con i nuovi dati ricevuti, incluso l'URL dell'avatar
+            if (response.data && response.data.user) {
+                const updatedUser = response.data.user;
+
+                // Aggiungi l'URL dell'avatar
+                if (updatedUser._id) {
+                    updatedUser.avatarUrl = `http://localhost:3000/api/users/avatar/${updatedUser._id}`;
+                }
+
+                setUser(updatedUser);
+                return { success: true, user: updatedUser };
+            }
+
+            return { success: false, error: "Errore durante l'aggiornamento" };
+        } catch (error) {
+            console.error("Errore nell'upload dell'avatar:", error);
+            return {
+                success: false,
+                error: error.response?.data?.message || "Errore durante l'upload dell'avatar"
+            };
+        }
+    };
+
+    // Funzione per aggiornare l'utente (ad esempio dopo aver cambiato profilo)
+    const updateUserData = async () => {
+        // Funzione per aggiornare i dati dell'utente corrente
+
+        try {
+            const token = localStorage.getItem('token');
+            if (!token) return { success: false, error: "Non autenticato" };
+
+            const response = await axios.get("http://localhost:3000/api/users/profile", {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (response.data) {
+                const userData = response.data;
+
+                // Aggiungi l'URL dell'avatar
+                if (userData._id) {
+                    userData.avatarUrl = `http://localhost:3000/api/users/avatar/${userData._id}`;
+                }
+
+                setUser(userData);
+                return { success: true, user: userData };
+            }
+
+            return { success: false, error: "Nessun dato ricevuto" };
+        } catch (error) {
+            console.error("Errore nell'aggiornamento dati utente:", error);
+            return {
+                success: false,
+                error: error.response?.data?.message || "Errore durante l'aggiornamento dei dati"
+            };
+        }
+    };
+
     return (
         <AuthContext.Provider value={{
-            user,       // Stato dell'utente attuale
-            setUser,    // Funzione per modificare l'utente
-            loading,    // Stato di caricamento
-            login,      // Funzione di login
-            logout,     // Funzione di logout
-            register    // Funzione di registrazione
+            user,             // Stato dell'utente attuale
+            setUser,          // Funzione per modificare l'utente
+            loading,          // Stato di caricamento
+            login,            // Funzione di login
+            logout,           // Funzione di logout
+            register,         // Funzione di registrazione
+            uploadAvatar,     // Funzione per caricare l'avatar
+            updateUserData    // Funzione per aggiornare i dati utente
         }}>
             {children}
             {/* Renderizza tutti i componenti figli avvolti dal provider */}
