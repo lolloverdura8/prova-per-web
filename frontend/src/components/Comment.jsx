@@ -13,11 +13,6 @@ const Comments = ({ comments = [] }) => {
                 <div key={index} className="comment">
                     <div className="comment-header">
                         <div className="comment-author-info">
-                            <img
-                                src={user?.avatar || '/path/to/default-avatar.png'}
-                                alt={`Avatar di ${user?.username}`}
-                                className="avatar-image"
-                            />
                             <span className="comment-author">{comment.user?.username}</span>
                         </div>
                         <span className="comment-date">

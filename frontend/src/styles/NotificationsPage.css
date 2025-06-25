@@ -1,0 +1,15 @@
+.notifications-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: var(--spacing-md);
+}
+
+.notifications-container h2 {
+    font-size: var(--font-size-lg);
+    color: var(--primary-light);
+    margin-bottom: var(--spacing-md);
+    text-align: left;
+}

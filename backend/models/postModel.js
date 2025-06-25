@@ -36,7 +36,13 @@ const PostSchema = mongoose.Schema({
     createdAt: {
         type: Date,
         default: Date.now
-    }
+    },
+
+    saved: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    }]
+
 }, { timestamps: true });
 
 module.exports = mongoose.model("Post", PostSchema);

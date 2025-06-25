@@ -16,6 +16,8 @@ const userRoutes = require("./routes/usersRoutes");
 const postRoutes = require("./routes/postRoutes");
 // Importa le rotte per la gestione dei post
 
+const notificationsRoutes = require("./routes/notificationsRoutes");
+
 const app = express();
 // Inizializza l'applicazione Express
 
@@ -37,6 +39,8 @@ app.use("/api/users", userRoutes);
 
 app.use("/api/posts", postRoutes);
 // Collega le rotte dei post al percorso /api/posts
+
+app.use("/api/notifications", notificationsRoutes);
 
 mongoose
     .connect(process.env.MONGODB_URI)

@@ -5,8 +5,10 @@ import Home from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 import SearchPage from "./pages/SearchPage";
 import ProfilePage from "./pages/ProfilePage";
+import Saved from "./pages/Saved";
 import { getUserPreference, PREFERENCE_TYPES } from "./utils/preferenceUtils";
 import './App.css';
+import NotificationPage from "./pages/NotificationPage";
 
 function App() {
     // Applica il tema salvato nei cookie quando l'app viene caricata
@@ -25,6 +27,8 @@ function App() {
                     <Route path="/home" element={<Home />} />
                     <Route path="/search" element={<SearchPage />} />
                     <Route path="/profile" element={<ProfilePage />} />
+                    <Route path="/saved" element={<Saved />} />
+                    <Route path="/notifications" element={<NotificationPage />} />
                 </Routes>
             </Router>
         </AuthProvider>

@@ -92,12 +92,16 @@ const Sidebar = () => {
                 {/* Icona ricerca */}
             </div>
 
-            <div className="icon">
+            <div className={`icon ${isActive('/notifications') ? 'active' : ''}`}
+                onClick={() => navigateTo('/notifications')}>
                 <FaBell title="Notifiche" />
-                {/* Icona notifiche (funzionalità non implementata) */}
             </div>
 
-            <div className="icon">
+            <div className={`icon ${isActive('/saved') ? 'active' : ''}`}
+                // Classe condizionale: aggiunge 'active' se la rotta corrente è '/saved'
+                onClick={() => navigateTo('/saved')}
+            >
+
                 <FaBookmark title="Salvati" />
                 {/* Icona segnalibri (funzionalità non implementata) */}
             </div>

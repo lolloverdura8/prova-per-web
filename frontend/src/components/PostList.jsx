@@ -1,52 +1,40 @@
 import React, { useEffect, useState } from "react";
-// Importa React e gli hook useEffect e useState
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 import axios from 'axios';
-// Importa axios per le richieste HTTP
 
 import Post from "./Post";
-// Importa il componente Post per visualizzare i singoli post
 
 import Autocomplete from "./AutoComplete";
-// Importa il componente Autocomplete per i filtri
 
 import { FaTimes } from "react-icons/fa";
-// Importa l'icona X da react-icons
 
 import '../styles/PostList.css';
-// Importa gli stili CSS per questo componente
 
-const PostList = ({ refreshTrigger }) => {
-    // Definizione del componente PostList che accetta refreshTrigger come prop
+const PostList = ({ refreshTrigger, savedMode }) => {
 
     const [posts, setPosts] = useState([]);
-    // Stato per memorizzare tutti i post scaricati dal server
 
     const [filteredPosts, setFilteredPosts] = useState([]);
-    // Stato per memorizzare i post filtrati in base ai criteri di filtro
 
     const [loading, setLoading] = useState(true);
-    // Stato per gestire la visualizzazione del caricamento
 
     const [error, setError] = useState('');
-    // Stato per memorizzare eventuali errori
 
     // Filter states
     const [userFilter, setUserFilter] = useState('');
-    // Stato per il filtro per utente
 
     const [dateFilter, setDateFilter] = useState('');
-    // Stato per il filtro per data
 
     const [tagFilter, setTagFilter] = useState('');
-    // Stato per il filtro per tag
+
+    const [dateInput, setDateInput] = useState(null); // ora è un oggetto Date o null
 
     // Opzioni per l'autocomplete (ora caricate dal server)
     const [uniqueAuthors, setUniqueAuthors] = useState([]);
-    // Stato per memorizzare gli autori unici per le opzioni dell'autocomplete
 
     const [uniqueTags, setUniqueTags] = useState([]);
-    // Stato per memorizzare i tag unici per le opzioni dell'autocomplete
 
     // Carica tutti i post senza filtri
     const fetchPosts = async () => {
@@ -199,55 +187,172 @@ const PostList = ({ refreshTrigger }) => {
     useEffect(() => {
         // Effetto che si attiva quando il componente si monta o refreshTrigger cambia
 
-        fetchPosts();
-        // Chiama la funzione per recuperare tutti i post
-    }, [refreshTrigger]);
-    // L'effetto si riattiva quando refreshTrigger cambia
+        if (savedMode) {
+            // Se siamo nella modalità salvati
+
+            const fetchSavedPosts = async () => {
+                // Funzione per recuperare i post salvati
+
+                setLoading(true);
+                // Imposta lo stato di caricamento
+
+                setError('');
+                // Resetta eventuali errori precedenti
+
+                try {
+                    // Tenta di eseguire la richiesta
+
+                    const response = await axios.get('http://localhost:3000/api/posts/saved', {
+                        headers: {
+                            Authorization: `Bearer ${localStorage.getItem('token')}`
+                        }
+                    });
+                    // Invia una richiesta GET all'endpoint dei post salvati
+
+                    if (response.data) {
+                        // Se la risposta contiene dati
+
+                        setPosts(response.data);
+                        // Aggiorna lo stato dei post con i dati ricevuti
+
+                        setFilteredPosts(response.data);
+                        // Inizialmente, i post filtrati sono gli stessi di tutti i post
+
+                        // Estrai autori e tag unici per i filtri
+                        const authors = [...new Set(response.data
+                            .map(post => post.author?.username)
+                            .filter(Boolean))];
+                        // Estrae gli autori unici dai post
+
+                        setUniqueAuthors(authors);
+                        // Aggiorna lo stato degli autori unici
+
+                        const tags = [...new Set(response.data
+                            .flatMap(post => post.tags || [])
+                            .filter(Boolean))];
+                        // Estrae i tag unici dai post
+
+                        setUniqueTags(tags);
+                        // Aggiorna lo stato dei tag unici
+                    } else {
+                        // Se la risposta non contiene dati
+
+                        setError('No saved posts found');
+                        // Imposta un messaggio di errore
+                    }
+                } catch (error) {
+                    // Se la richiesta fallisce
+
+                    console.error('Error fetching saved posts:', error);
+                    // Logga l'errore nella console
+
+                    setError('Failed to load saved posts. Please try again later.');
+                    // Imposta un messaggio di errore per l'utente
+                } finally {
+                    setLoading(false);
+                    // Termina lo stato di caricamento indipendentemente dal risultato
+                }
+            };
+
+            fetchSavedPosts();
+            // Chiama la funzione per recuperare i post salvati
+        } else {
+            // Se non siamo nella modalità salvati
+
+            fetchPosts();
+            // Chiama la funzione per recuperare tutti i post
+        }
+    }, [refreshTrigger, savedMode]);
+    // L'effetto si riattiva quando refreshTrigger o savedMode cambiano
 
     // Applica i filtri (ora chiama il backend invece di filtrare localmente)
     useEffect(() => {
-        // Effetto che si attiva quando cambiano i filtri o posts.length
+        setLoading(true);
+        setError('');
 
-        // Se non ci sono filtri attivi, mostra tutti i post
-        if (!userFilter && !dateFilter && !tagFilter) {
-            // Se non c'è nessun filtro attivo
+        const params = new URLSearchParams();
+        if (userFilter) params.append('author', userFilter);
+        if (dateFilter) params.append('date', dateFilter);
+        if (tagFilter) params.append('tag', tagFilter);
 
-            setFilteredPosts(posts);
-            // Usa tutti i post (nessun filtro)
-
-            console.log("Nessun filtro attivo, mostro tutti i post");
-            // Logga un messaggio per debug
+        let url;
+        let headers = {};
+        if (savedMode) {
+            // Siamo nella pagina "Salvati"
+            url = `http://localhost:3000/api/posts/saved/filter`;
+            const token = localStorage.getItem('token');
+            if (token) headers['Authorization'] = `Bearer ${token}`;
         } else {
-            // Se c'è almeno un filtro attivo
-
-            // Altrimenti, richiedi i post filtrati dal server
-            console.log("Filtri attivi, richiedo post filtrati");
-            // Logga un messaggio per debug
-
-            fetchFilteredPosts();
-            // Chiama la funzione per recuperare i post filtrati
+            // Siamo in homepage
+            url = `http://localhost:3000/api/posts/filter`;
         }
-    }, [userFilter, dateFilter, tagFilter, posts.length]);
+
+        // Se NON ci sono filtri, carica la lista completa (come all'inizio)
+        if (!userFilter && !dateFilter && !tagFilter) {
+            if (savedMode) {
+                // Lista completa dei post salvati
+                axios.get('http://localhost:3000/api/posts/saved', { headers })
+                    .then(response => {
+                        setFilteredPosts(response.data);
+                        const authors = [...new Set(response.data.map(post => post.author?.username).filter(Boolean))];
+                        setUniqueAuthors(authors);
+                        const tags = [...new Set(response.data.flatMap(post => post.tags || []).filter(Boolean))];
+                        setUniqueTags(tags);
+                    })
+                    .catch(error => {
+                        setError('Errore nel caricamento dei post');
+                        setFilteredPosts([]);
+                    })
+                    .finally(() => setLoading(false));
+            } else {
+                // Lista completa di tutti i post
+                axios.get('http://localhost:3000/api/posts')
+                    .then(response => {
+                        setFilteredPosts(response.data);
+                        const authors = [...new Set(response.data.map(post => post.author?.username).filter(Boolean))];
+                        setUniqueAuthors(authors);
+                        const tags = [...new Set(response.data.flatMap(post => post.tags || []).filter(Boolean))];
+                        setUniqueTags(tags);
+                    })
+                    .catch(error => {
+                        setError('Errore nel caricamento dei post');
+                        setFilteredPosts([]);
+                    })
+                    .finally(() => setLoading(false));
+            }
+            return;
+        }
+
+        // Se ci sono filtri, chiama il backend per i post filtrati
+        if (params.toString()) url += `?${params.toString()}`;
+
+        axios.get(url, { headers })
+            .then(response => {
+                setFilteredPosts(response.data);
+                const authors = [...new Set(response.data.map(post => post.author?.username).filter(Boolean))];
+                setUniqueAuthors(authors);
+                const tags = [...new Set(response.data.flatMap(post => post.tags || []).filter(Boolean))];
+                setUniqueTags(tags);
+            })
+            .catch(error => {
+                setError('Errore nel caricamento dei post');
+                setFilteredPosts([]);
+            })
+            .finally(() => setLoading(false));
+    }, [userFilter, dateFilter, tagFilter, refreshTrigger, savedMode]);
     // L'effetto si riattiva quando cambia uno qualsiasi dei filtri o il numero di post
 
     const clearFilters = () => {
-        // Funzione per cancellare tutti i filtri
-
         setUserFilter('');
-        // Resetta il filtro utente
-
         setDateFilter('');
-        // Resetta il filtro data
-
+        setDateInput(null);
         setTagFilter('');
-        // Resetta il filtro tag
     };
+    // Funzione per cancellare tutti i filtri
 
     if (loading && filteredPosts.length === 0) return <div className="loading-container">Caricamento post...</div>;
-    // Se sta caricando e non ci sono post da mostrare, mostra un indicatore di caricamento
 
     if (error && filteredPosts.length === 0) return <div className="error-container">{error}</div>;
-    // Se c'è un errore e non ci sono post da mostrare, mostra il messaggio di errore
 
     return (
         <div className="post-list-container">
@@ -274,11 +379,22 @@ const PostList = ({ refreshTrigger }) => {
 
                     <div className="filter-group">
                         <label htmlFor="date-filter">Per Data:</label>
-                        <input
-                            type="date"
+                        <DatePicker
                             id="date-filter"
-                            value={dateFilter}
-                            onChange={(e) => setDateFilter(e.target.value)}
+                            selected={dateInput}
+                            onChange={date => {
+                                setDateInput(date);
+                                if (date) {
+                                    // Formatta la data in YYYY-MM-DD per il backend
+                                    const formatted = date.toISOString().slice(0, 10);
+                                    setDateFilter(formatted);
+                                } else {
+                                    setDateFilter('');
+                                }
+                            }}
+                            dateFormat="yyyy-MM-dd"
+                            placeholderText="Seleziona una data"
+                            isClearable
                         />
                     </div>
                     {/* Input di tipo date per filtrare per data */}

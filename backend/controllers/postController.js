@@ -1,4 +1,5 @@
 const Post = require("../models/postModel");
+const Notification = require("../models/notificationModel");
 
 module.exports = {
     createPost: async (req, res) => {
@@ -78,6 +79,18 @@ module.exports = {
 
             await post.save();
 
+            // CREA NOTIFICA SOLO SE NON SEI L'AUTORE
+            if (post.author.toString() !== req.user.id.toString()) {
+                const preview = text.length > 50 ? text.substring(0, 50) + "..." : text;
+                await Notification.create({
+                    userId: post.author,
+                    actorId: req.user.id,
+                    postId: post._id,
+                    type: 'comment',
+                    preview
+                });
+            }
+
             // Get the newly added comment with populated user
             const newComment = post.comments[post.comments.length - 1];
             const populatedPost = await Post.findById(post._id)
@@ -117,16 +130,37 @@ module.exports = {
             const likeIndex = post.likes.indexOf(userId);
 
             // Toggle like
+            let isLiked;
             if (likeIndex === -1) {
                 // Add like
                 post.likes.push(userId);
+                isLiked = true;
+
+                // CREA NOTIFICA SOLO SE NON SEI L'AUTORE
+                if (post.author.toString() !== userId.toString()) {
+                    const exist = await Notification.findOne({
+                        userId: post.author,
+                        actorId: userId,
+                        postId: post._id,
+                        type: 'like'
+                    });
+                    if (!exist) {
+                        await Notification.create({
+                            userId: post.author,
+                            actorId: userId,
+                            postId: post._id,
+                            type: 'like'
+                        });
+                    }
+                }
             } else {
                 // Remove like
                 post.likes.splice(likeIndex, 1);
+                isLiked = false;
             }
 
             await post.save();
-            res.json({ likes: post.likes.length, isLiked: likeIndex === -1 });
+            res.json({ likes: post.likes.length, isLiked });
         } catch (err) {
             res.status(500).json({ error: err.message });
         }
@@ -242,5 +276,82 @@ module.exports = {
                 details: err.message
             });
         }
-    }
-};
+    },
+
+    getSavedPosts: async (req, res) => {
+        try {
+            const userId = req.user.id; // Assuming user ID is available in req.user
+            const posts = await Post.find({ saved: userId })
+                .populate('author', 'username')
+                .populate('comments.user', 'username')
+                .sort({ createdAt: -1 });
+
+            res.json(posts);
+        } catch (err) {
+            res.status(500).json({ error: err.message });
+        }
+    },
+
+    toggleSave: async (req, res) => {
+        try {
+            const post = await Post.findById(req.params.id);
+            if (!post) return res.status(404).json({ message: 'Post not found' });
+
+            const userId = req.user.id;
+            const alreadySaved = post.saved.includes(userId);
+
+            if (alreadySaved) {
+                post.saved.pull(userId);
+            } else {
+                post.saved.push(userId);
+            }
+
+            await post.save();
+
+            res.json({
+                isSaved: !alreadySaved,
+                saved: post.saved
+            });
+        } catch (error) {
+            res.status(500).json({ message: 'Server error' });
+        }
+    },
+
+    getSavedPostsFiltered: async (req, res) => {
+        try {
+            const { author, date, tag } = req.query;
+            const userId = req.user.id;
+            const query = { saved: userId };
+
+            if (author) {
+                const User = require("../models/userModel");
+                const user = await User.findOne({ username: author });
+                if (user) query.author = user._id;
+                else return res.json([]); // Nessun post se autore non trovato
+            }
+
+            if (date) {
+                const startDate = new Date(date);
+                startDate.setHours(0, 0, 0, 0);
+                const endDate = new Date(date);
+                endDate.setHours(23, 59, 59, 999);
+                query.createdAt = { $gte: startDate, $lte: endDate };
+            }
+
+            if (tag) {
+                query.tags = tag;
+            }
+
+            const posts = await Post.find(query)
+                .populate('author', 'username')
+                .populate('comments.user', 'username')
+                .sort({ createdAt: -1 });
+
+            res.json(posts);
+        } catch (err) {
+            res.status(500).json({ error: err.message });
+        }
+    },
+
+
+}

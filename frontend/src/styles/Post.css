@@ -132,6 +132,10 @@
     animation: iconPulse 0.3s ease-in-out;
 }
 
+.action-button.saved .action-icon {
+    color: #e0245e; /* oppure usa var(--primary) */
+}
+
 .action-button .count-badge {
     margin-left: var(--spacing-xs);
     font-size: var(--font-size-sm);

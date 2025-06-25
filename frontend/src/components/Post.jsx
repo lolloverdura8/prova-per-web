@@ -1,18 +1,33 @@
 import React, { useState, useEffect } from "react";
 import axios from 'axios';
 import { Comments, AddComment } from "./Comment";
-import { FaHeart, FaRegHeart, FaComment } from "react-icons/fa";
+import { FaHeart, FaRegHeart, FaComment, FaBookmark } from "react-icons/fa";
 import '../styles/Post.css';
 
 const Post = ({ post }) => {
-    const { _id, description, author, createdAt, comments, likes = [], tags = [] } = post;
+    const { _id, description, author, createdAt, comments, likes = [], tags = [], saved = [] } = post;
     const [postComments, setPostComments] = useState(comments || []);
     const [showComments, setShowComments] = useState(false);
     const [likesCount, setLikesCount] = useState(likes.length);
     const [isLiked, setIsLiked] = useState(false);
+    const [isSaved, setIsSaved] = useState(false);
 
     // Check if the current user has liked this post
     useEffect(() => {
+        const checkIfSaved = async () => {
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) return;
+                const userData = await axios.get('http://localhost:3000/api/users/profile', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (userData.data && userData.data._id) {
+                    setIsSaved(saved.includes(userData.data._id));
+                }
+            } catch (error) {
+                console.error('Error checking saved status:', error);
+            }
+        };
         const checkIfLiked = async () => {
             try {
                 const token = localStorage.getItem('token');
@@ -31,7 +46,8 @@ const Post = ({ post }) => {
         };
 
         checkIfLiked();
-    }, [likes]);
+        checkIfSaved();
+    }, [likes, saved]);
 
     const handleLike = async () => {
         try {
@@ -61,6 +77,26 @@ const Post = ({ post }) => {
     const formatDate = (dateString) => {
         const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
         return new Date(dateString).toLocaleDateString(undefined, options);
+    };
+
+    const handleSave = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            if (!token) return;
+
+            const response = await axios.post(
+                `http://localhost:3000/api/posts/${_id}/Save`,
+                {},
+                { headers: { 'Authorization': `Bearer ${token}` } }
+            );
+
+            if (response.data) {
+                setIsSaved(response.data.isSaved);
+                post.saved = response.data.saved; // aggiorna il campo saved
+            }
+        } catch (error) {
+            console.error('Error saving post:', error);
+        }
     };
 
     return (
@@ -108,6 +144,10 @@ const Post = ({ post }) => {
                     <span className="button-text">Commenti</span>
                     <FaComment className="action-icon" />
                     <span className="count-badge">{postComments.length}</span>
+                </button>
+                <button className={`action-button ${isSaved ? 'saved' : ''}`} onClick={handleSave}>
+                    <span>{isSaved ? "Salvato" : "Salva"}</span>
+                    <FaBookmark className="action-icon" />
                 </button>
             </div>
 
