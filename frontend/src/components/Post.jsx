@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Comments, AddComment } from "./Comment";
 import { FaHeart, FaRegHeart, FaComment, FaBookmark } from "react-icons/fa";
 import '../styles/Post.css';
+import { useSocket } from '../context/SocketContext';
 
 const Post = ({ post }) => {
     const { _id, description, author, createdAt, comments, likes = [], tags = [], saved = [] } = post;
@@ -11,6 +12,7 @@ const Post = ({ post }) => {
     const [likesCount, setLikesCount] = useState(likes.length);
     const [isLiked, setIsLiked] = useState(false);
     const [isSaved, setIsSaved] = useState(false);
+    const { socket } = useSocket();
 
     // Check if the current user has liked this post
     useEffect(() => {
@@ -98,6 +100,14 @@ const Post = ({ post }) => {
             console.error('Error saving post:', error);
         }
     };
+
+    useEffect(() => {
+        if (!socket) return;
+        socket.on('new-comment', (newComment) => {
+            setPostComments(prev => [...prev, newComment]);
+        });
+        return () => socket.off('new-comment');
+    }, [socket]);
 
     return (
         <div className="post">

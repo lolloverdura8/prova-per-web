@@ -27,7 +27,7 @@ module.exports = {
             delete userObj.password;
 
             const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-                expiresIn: "1h",
+                expiresIn: "7d",
             });
             res.json({ token, user: userObj });
         } catch (err) {

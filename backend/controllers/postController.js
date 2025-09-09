@@ -79,17 +79,6 @@ module.exports = {
 
             await post.save();
 
-            // CREA NOTIFICA SOLO SE NON SEI L'AUTORE
-            if (post.author.toString() !== req.user.id.toString()) {
-                const preview = text.length > 50 ? text.substring(0, 50) + "..." : text;
-                await Notification.create({
-                    userId: post.author,
-                    actorId: req.user.id,
-                    postId: post._id,
-                    type: 'comment',
-                    preview
-                });
-            }
 
             // Get the newly added comment with populated user
             const newComment = post.comments[post.comments.length - 1];
@@ -99,9 +88,33 @@ module.exports = {
             const populatedComment = populatedPost.comments.id(newComment._id);
 
             res.status(201).json(populatedComment);
+
+            // CREA NOTIFICA SOLO SE NON SEI L'AUTORE
+            if (post.author.toString() !== req.user.id.toString()) {
+                const preview = text.length > 50 ? text.substring(0, 50) + "..." : text;
+                const notifica = await Notification.create({
+                    userId: post.author,
+                    actorId: req.user.id,
+                    postId: post._id,
+                    type: 'comment',
+                    preview
+                });
+
+                // INVIA LA NOTIFICA REALTIME
+                if (req.io) {
+                    req.io.to(post.author.toString()).emit('new-notification', notifica);
+                }
+            }
+
+            // Invia il commento appena aggiunto a tutti gli utenti che stanno visualizzando il post
+            req.io.to(post._id.toString()).emit('new-comment', newComment);
+            console.log("Inviata notifica realtime a", post.author.toString());
         } catch (err) {
             res.status(500).json({ error: err.message });
         }
+
+
+
     },
 
     getComments: async (req, res) => {
@@ -134,26 +147,9 @@ module.exports = {
             if (likeIndex === -1) {
                 // Add like
                 post.likes.push(userId);
-                isLiked = true;
-
-                // CREA NOTIFICA SOLO SE NON SEI L'AUTORE
-                if (post.author.toString() !== userId.toString()) {
-                    const exist = await Notification.findOne({
-                        userId: post.author,
-                        actorId: userId,
-                        postId: post._id,
-                        type: 'like'
-                    });
-                    if (!exist) {
-                        await Notification.create({
-                            userId: post.author,
-                            actorId: userId,
-                            postId: post._id,
-                            type: 'like'
-                        });
-                    }
-                }
-            } else {
+                isLiked = true
+            }
+            else {
                 // Remove like
                 post.likes.splice(likeIndex, 1);
                 isLiked = false;
@@ -161,8 +157,35 @@ module.exports = {
 
             await post.save();
             res.json({ likes: post.likes.length, isLiked });
+
+            // CREA NOTIFICA SOLO SE NON SEI L'AUTORE
+            if (post.author.toString() !== userId.toString()) {
+                const exist = await Notification.findOne({
+                    userId: post.author,
+                    actorId: userId,
+                    postId: post._id,
+                    type: 'like'
+                });
+                if (!exist) {
+                    await Notification.create({
+                        userId: post.author,
+                        actorId: userId,
+                        postId: post._id,
+                        type: 'like'
+                    });
+
+                    // Invia la notifica realtime all'utente destinatario
+                    req.io.to(post.author.toString()).emit('new-notification', {
+                        actorId: req.user.id,
+                        postId: post._id,
+                        type: 'like'
+                    });
+                    console.log("Inviata notifica realtime a", post.author.toString());
+                }
+            }
         } catch (err) {
-            res.status(500).json({ error: err.message });
+            console.error("Errore in toggleLike:", err);
+            res.status(500).json({ message: "Errore interno" });
         }
     },
 

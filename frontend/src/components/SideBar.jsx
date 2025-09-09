@@ -1,7 +1,7 @@
 import React from "react";
 // Importa React per poter utilizzare JSX
 
-import { FaHome, FaBell, FaUser, FaCog, FaSearch, FaBookmark, FaSignOutAlt } from "react-icons/fa";
+import { FaHome, FaUser, FaCog, FaSearch, FaBookmark, FaSignOutAlt, FaBell } from "react-icons/fa";
 // Importa diverse icone dalla libreria react-icons/fa (Font Awesome)
 
 import { useLocation, useNavigate } from "react-router-dom";
@@ -9,6 +9,9 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 import { useAuth } from "../context/AuthContext";
 // Importa il hook personalizzato per accedere al contesto di autenticazione
+
+import { useSocket } from "../context/SocketContext";
+// Importa il hook personalizzato per accedere al contesto del socket
 
 import UserSettings from "./UserSettings";
 // Importa il componente per le impostazioni utente
@@ -27,6 +30,9 @@ const Sidebar = () => {
 
     const { logout } = useAuth();
     // Estrae la funzione logout dal contesto di autenticazione
+
+    const { hasUnreadNotifications, markAllNotificationsAsRead } = useSocket();
+    // Estrae le funzioni per gestire le notifiche dal contesto del socket
 
     const path = location.pathname;
     // Estrae il percorso corrente dall'oggetto location
@@ -53,6 +59,14 @@ const Sidebar = () => {
 
         navigate('/');
         // Reindirizza alla pagina iniziale (login)
+    };
+
+    const handleNotificationClick = async () => {
+        await markAllNotificationsAsRead();
+        // Segna tutte le notifiche come lette
+
+        navigate('/notifications');
+        // Naviga alla pagina delle notifiche
     };
 
     return (
@@ -92,9 +106,14 @@ const Sidebar = () => {
                 {/* Icona ricerca */}
             </div>
 
-            <div className={`icon ${isActive('/notifications') ? 'active' : ''}`}
-                onClick={() => navigateTo('/notifications')}>
-                <FaBell title="Notifiche" />
+            <div
+                className={`icon ${location.pathname === '/notifications' ? 'active' : ''} ${hasUnreadNotifications ? 'has-notifications' : ''}`}
+                // Classe condizionale: aggiunge 'active' se la rotta corrente è '/notifications'
+                onClick={handleNotificationClick}
+                title="Notifiche"
+            >
+                <FaBell />
+                {/* Icona notifiche */}
             </div>
 
             <div className={`icon ${isActive('/saved') ? 'active' : ''}`}

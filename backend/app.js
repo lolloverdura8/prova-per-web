@@ -18,7 +18,23 @@ const postRoutes = require("./routes/postRoutes");
 
 const notificationsRoutes = require("./routes/notificationsRoutes");
 
+const http = require('http');
 const app = express();
+const server = http.createServer(app);
+const { Server } = require('socket.io');
+const io = new Server(server, { cors: { origin: '*' } });
+
+// Gestione stanze utente
+io.on('connection', (socket) => {
+    socket.on('join', (userId) => {
+        socket.join(userId);
+        console.log("Socket", socket.id, "join stanza", userId);
+    });
+    socket.on("connect", () => console.log("Socket connesso!"));
+});
+
+app.set('io', io); // Per accedere a io nei controller
+
 // Inizializza l'applicazione Express
 
 app.use(express.json());
@@ -37,10 +53,14 @@ app.use(
 app.use("/api/users", userRoutes);
 // Collega le rotte degli utenti al percorso /api/users
 
-app.use("/api/posts", postRoutes);
-// Collega le rotte dei post al percorso /api/posts
+app.use("/api/posts", (req, res, next) => {
+    req.io = io;
+    next();
+}, postRoutes);
+// Collega le rotte dei post al percorso /api/posts, passando io come middleware
 
 app.use("/api/notifications", notificationsRoutes);
+// Collega le rotte delle notifiche al percorso /api/notifications
 
 mongoose
     .connect(process.env.MONGODB_URI)
@@ -54,7 +74,7 @@ const PORT = process.env.PORT || 3000;
 // Definisce la porta su cui il server ascolterà, usando quella specificata nelle variabili d'ambiente o 3000 come fallback
 
 // Avvio Server
-app.listen(PORT, '0.0.0.0', () => {
+server.listen(PORT, '0.0.0.0', () => {
     // Avvia il server HTTP in ascolto su tutte le interfacce di rete
     console.log(`Server in ascolto su porta ${PORT}`);
     // Stampa un messaggio di conferma con la porta utilizzata
@@ -63,3 +83,11 @@ app.listen(PORT, '0.0.0.0', () => {
     console.error('Errore durante l\'avvio del server:', err);
     // Stampa l'errore se si verifica
 });
+
+if (require.main === module) {
+    server.listen(3000, () => console.log('Server avviato su porta 3000'));
+}
+// Esporta sia app che io
+module.exports = { app, io };
+
+// Avvia il server SOLO da qui:
