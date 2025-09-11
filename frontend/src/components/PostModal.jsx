@@ -3,6 +3,7 @@ import { FaPencilAlt, FaTimes } from 'react-icons/fa';
 import CreatePost from './CreatePost';
 import '../styles/PostModal.css';
 
+
 // Componente modal per creare un nuovo post
 
 const PostModal = ({ isOpen, onClose, onPostCreated }) => {

@@ -6,6 +6,7 @@ import Navbar from "../components/NavBar";
 import Post from "../components/Post";
 import { FaSearch, FaTimes } from "react-icons/fa";
 import "../styles/SearchPage.css";
+import { authCookies } from "../utils/cookieUtils";
 
 
 const SearchPage = () => {
@@ -32,8 +33,7 @@ const SearchPage = () => {
     useEffect(() => {
         // Effetto che si esegue quando il componente si monta
 
-        const token = localStorage.getItem('token');
-        // Recupera il token dal localStorage
+        const token = authCookies.getAuthToken();
 
         if (!token) {
             // Se non c'è un token (utente non autenticato)

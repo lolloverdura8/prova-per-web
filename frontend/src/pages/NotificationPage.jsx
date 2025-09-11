@@ -6,6 +6,7 @@ import Navbar from "../components/NavBar";
 import NotificationItem from "../components/Notificationitem";
 import axios from "axios";
 import "../styles/NotificationsPage.css";
+import { authCookies } from "../utils/cookieUtils";
 
 const NotificationsPage = () => {
     const { user } = useAuth();
@@ -16,7 +17,7 @@ const NotificationsPage = () => {
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        if (!user && !localStorage.getItem('token')) {
+        if (!user && !authCookies.getAuthToken()) {
             navigate('/');
         }
     }, [user, navigate]);
@@ -28,7 +29,7 @@ const NotificationsPage = () => {
         setLoading(true);
         setError(null); // Resetta l'errore prima di una nuova richiesta
 
-        const token = localStorage.getItem('token');
+        const token = authCookies.getAuthToken();
         if (!token) { return; }
 
         try {
@@ -79,7 +80,7 @@ const NotificationsPage = () => {
         return () => window.removeEventListener('notifications:refresh', onRefresh);
     }, [fetchNotifications]);
 
-    if (!user && localStorage.getItem('token')) {
+    if (!user && authCookies.getAuthToken()) {
         return <div className="loading">Loading...</div>;
     }
 

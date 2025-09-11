@@ -7,6 +7,7 @@ import Navbar from "../components/NavBar";
 import Post from "../components/Post";
 import { FaEdit, FaCheck, FaTimes } from "react-icons/fa";
 import "../styles/ProfilePage.css";
+import { authCookies } from "../utils/cookieUtils";
 
 
 const ProfilePage = () => {
@@ -39,7 +40,7 @@ const ProfilePage = () => {
         // Effetto che si attiva al caricamento della pagina o quando user o navigate cambiano
 
         // redirect su login se non autenticato
-        if (!user && !localStorage.getItem('token')) {
+        if (!user && !authCookies.getAuthToken()) {
             // Se non c'è un utente autenticato e non c'è un token nel localStorage
 
             navigate('/');
@@ -123,7 +124,7 @@ const ProfilePage = () => {
     // Gestisce il salvataggio delle modifiche al profilo
     const handleSaveProfile = async () => {
         try {
-            const token = localStorage.getItem('token');
+            const token = authCookies.getAuthToken();
             const response = await axios.put(
                 'http://localhost:3000/api/users/profile',
                 profileData,
@@ -155,7 +156,7 @@ const ProfilePage = () => {
         }));
     };
 
-    if (!user && localStorage.getItem('token')) {
+    if (!user && authCookies.getAuthToken()) {
         // Se c'è un token ma l'utente non è ancora caricato (autenticazione in corso)
         return <div className="loading">Loading...</div>;
         // Mostra un indicatore di caricamento

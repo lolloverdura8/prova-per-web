@@ -4,6 +4,7 @@ import { Comments, AddComment } from "./Comment";
 import { FaHeart, FaRegHeart, FaComment, FaBookmark } from "react-icons/fa";
 import '../styles/Post.css';
 import { useSocket } from '../context/SocketContext';
+import { authCookies } from '../utils/cookieUtils';
 
 const Post = ({ post }) => {
     const { _id, description, author, createdAt, comments, likes = [], tags = [], saved = [] } = post;
@@ -18,7 +19,7 @@ const Post = ({ post }) => {
     useEffect(() => {
         const checkIfSaved = async () => {
             try {
-                const token = localStorage.getItem('token'); // Ottieni il token da localStorage per l'autenticazione
+                const token = authCookies.getAuthToken(); // Ottieni il token da cookies
                 if (!token) return;
                 const userData = await axios.get('http://localhost:3000/api/users/profile', {
                     headers: { 'Authorization': `Bearer ${token}` }
@@ -32,7 +33,7 @@ const Post = ({ post }) => {
         };
         const checkIfLiked = async () => {
             try {
-                const token = localStorage.getItem('token');
+                const token = authCookies.getAuthToken(); // Ottieni il token da cookies
                 if (!token) return;
 
                 const userData = await axios.get('http://localhost:3000/api/users/profile', {
@@ -53,7 +54,7 @@ const Post = ({ post }) => {
 
     const handleLike = async () => {
         try {
-            const token = localStorage.getItem('token');
+            const token = authCookies.getAuthToken(); // Ottieni il token da cookies
             if (!token) return;
 
             const response = await axios.post(
@@ -84,7 +85,7 @@ const Post = ({ post }) => {
 
     const handleSave = async () => {
         try {
-            const token = localStorage.getItem('token');
+            const token = authCookies.getAuthToken();
             if (!token) return;
 
             const response = await axios.post(

@@ -7,6 +7,7 @@ import PostList from "../components/PostList";
 import FloatingActionButton from "../components/FloatingActionButton";
 import PostModal from "../components/PostModal";
 import "../styles/HomePage.css";
+import { authCookies } from "../utils/cookieUtils";
 
 const Home = () => {
     const { user } = useAuth();
@@ -25,8 +26,8 @@ const Home = () => {
         // Effetto che si esegue quando il componente si monta o quando le dipendenze cambiano
 
         // Redirect to login if not authenticated
-        if (!user && !localStorage.getItem('token')) {
-            // Se non c'è un utente e non c'è un token nel localStorage
+        if (!user && !authCookies.getAuthToken()) {
+            // Se non c'è un utente e non c'è un token
 
             navigate('/');
             // Reindirizza alla pagina di login
@@ -34,7 +35,7 @@ const Home = () => {
     }, [user, navigate]);
     // L'effetto si riattiva quando l'utente o la funzione di navigazione cambiano
 
-    if (!user && localStorage.getItem('token')) {
+    if (!user && authCookies.getAuthToken()) {
         // Se c'è un token ma l'utente non è ancora caricato (autenticazione in corso)
 
         return <div className="loading">Loading...</div>;

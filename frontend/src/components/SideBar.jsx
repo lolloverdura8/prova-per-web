@@ -19,6 +19,7 @@ import UserSettings from "./UserSettings";
 import "../styles/Sidebar.css";
 // Importa gli stili CSS per la barra laterale
 
+
 const Sidebar = () => {
     // Definizione del componente Sidebar
 

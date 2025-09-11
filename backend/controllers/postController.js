@@ -5,12 +5,12 @@ module.exports = {
     createPost: async (req, res) => {
         try {
             const newPost = new Post({
-                ...req.body,
+                ...req.body, // description, image, tags etc, spread operator per non doverli elencare tutti
                 author: req.user.id // From auth middleware
             });
-            await newPost.save();
+            await newPost.save(); //save è un metodo asincrono che salva il post nel db
 
-            // Populate author for immediate display
+            // Popola l'autore prima di inviare la risposta
             const populatedPost = await Post.findById(newPost._id)
                 .populate('author', 'username');
 
@@ -59,7 +59,6 @@ module.exports = {
         }
     },
 
-    // New methods for comments and likes
     addComment: async (req, res) => {
         try {
             const { text } = req.body;

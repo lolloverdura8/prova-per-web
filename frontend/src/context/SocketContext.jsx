@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useRef, useState } from "r
 import { io } from "socket.io-client";
 import { useAuth } from "./AuthContext";
 import axios from "axios";
+import { authCookies } from '../utils/cookieUtils';
 
 const SocketContext = createContext(null); // Inizializza con null
 export const useSocket = () => useContext(SocketContext); // Hook personalizzato per usare il contesto
@@ -16,7 +17,7 @@ export const SocketProvider = ({ children }) => {
     // Segna tutte le notifiche come lette
     const markAllNotificationsAsRead = async () => {
         try {
-            const token = localStorage.getItem('token'); // Ottieni il token da localStorage
+            const token = authCookies.getAuthToken(); // Ottieni il token da localStorage
             await axios.post("http://localhost:3000/api/notifications/read-all", {}, {
                 headers: { Authorization: `Bearer ${token}` } // Includi il token nell'header di autorizzazione 
             });
@@ -32,7 +33,7 @@ export const SocketProvider = ({ children }) => {
         const checkUnreadNotifications = async () => {
             if (user && user._id) {
                 try {
-                    const token = localStorage.getItem('token');
+                    const token = authCookies.getAuthToken();
                     const response = await axios.get("http://localhost:3000/api/notifications", {
                         headers: { Authorization: `Bearer ${token}` }
                     });

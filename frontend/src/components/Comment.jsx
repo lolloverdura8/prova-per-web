@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from 'axios';
 import '../styles/Comment.css';
+import { authCookies } from '../utils/cookieUtils';
 
 // Comments display component
 const Comments = ({ comments = [] }) => {
@@ -41,7 +42,7 @@ const AddComment = ({ postId, onCommentAdded }) => {
         setError('');
 
         try {
-            const token = localStorage.getItem('token');
+            const token = authCookies.getAuthToken();
             if (!token) {
                 setError('You must be logged in to comment');
                 return;

@@ -11,6 +11,8 @@ import Autocomplete from "./AutoComplete";
 import { FaTimes } from "react-icons/fa";
 
 import '../styles/PostList.css';
+import { authCookies } from "../utils/cookieUtils";
+
 
 const PostList = ({ refreshTrigger, savedMode }) => {
 
@@ -192,7 +194,7 @@ const PostList = ({ refreshTrigger, savedMode }) => {
                 // Resetta eventuali errori precedenti
 
                 try {
-                    const token = localStorage.getItem('token');
+                    const token = authCookies.getAuthToken();
 
                     const response = await axios.get('http://localhost:3000/api/posts/saved', {
                         headers: {
@@ -266,7 +268,7 @@ const PostList = ({ refreshTrigger, savedMode }) => {
         if (savedMode) {
             // Siamo nella pagina "Salvati"
             url = `http://localhost:3000/api/posts/saved/filter`;
-            const token = localStorage.getItem('token'); // Ottieni il token da localStorage
+            const token = authCookies.getAuthToken(); // Ottieni il token dai cookie
             if (token) headers['Authorization'] = `Bearer ${token}`;
         } else {
             // Siamo in homepage

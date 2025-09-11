@@ -19,29 +19,6 @@ module.exports = {
         }
     },
 
-    async markNotificationAsRead(req, res) {
-        try {
-            const notificationId = req.params.id;
-            const userId = req.user.id;
-
-            const notification = await Notification.findOneAndUpdate(
-                { _id: notificationId, userId: mongoose.Types.ObjectId(userId) },
-                { isRead: true },
-                { new: true }
-            );
-
-            if (!notification) {
-                return res.status(404).json({ message: "Notifica non trovata" });
-            }
-
-            res.status(200).json(notification);
-
-        } catch (error) {
-            console.error("Errore nel marcare la notifica come letta:", error);
-            res.status(500).json({ message: "Errore interno del server" });
-        }
-    },
-
     async markAllNotificationsAsRead(req, res) {
         try {
             const userId = req.user.id;

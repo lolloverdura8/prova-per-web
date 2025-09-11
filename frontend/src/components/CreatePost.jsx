@@ -156,9 +156,8 @@ const CreatePost = ({ onPostCreated }) => {
 
         try {
             // Ottieni il token dal cookie o, se non presente, da localStorage
-            const tokenFromCookie = authCookies.getAuthToken();
-            const tokenFromStorage = localStorage.getItem('token');
-            const token = tokenFromCookie || tokenFromStorage;
+            const token = authCookies.getAuthToken();
+
 
             if (!token) {
                 setError('Devi essere loggato per creare un post');

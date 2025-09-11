@@ -8,6 +8,7 @@ import PostList from "../components/PostList";
 import FloatingActionButton from "../components/FloatingActionButton";
 import PostModal from "../components/PostModal";
 import "../styles/HomePage.css";
+import { authCookies } from "../utils/cookieUtils";
 
 const Saved = () => {
     const { user } = useAuth();
@@ -17,12 +18,12 @@ const Saved = () => {
 
     // Redirect se non autenticato
     useEffect(() => {
-        if (!user && !localStorage.getItem('token')) {
+        if (!user && !authCookies.getAuthToken()) {
             navigate('/');
         }
     }, [user, navigate]);
 
-    if (!user && localStorage.getItem('token')) {
+    if (!user && authCookies.getAuthToken()) {
         return <div className="loading">Loading...</div>;
         // Mostra un indicatore di caricamento se l'utente non è ancora caricato
     }
