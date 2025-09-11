@@ -54,6 +54,7 @@ export const AuthProvider = ({ children }) => {
 
         verifyAuth();
     }, []);
+    // Esegue la verifica dell'autenticazione al montaggio del componente
 
     // Funzione di login migliorata
     const login = async (credentials) => {

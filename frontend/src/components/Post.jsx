@@ -14,17 +14,17 @@ const Post = ({ post }) => {
     const [isSaved, setIsSaved] = useState(false);
     const { socket } = useSocket();
 
-    // Check if the current user has liked this post
+    // Controlla se l'utente ha già messo like o salvato il post
     useEffect(() => {
         const checkIfSaved = async () => {
             try {
-                const token = localStorage.getItem('token');
+                const token = localStorage.getItem('token'); // Ottieni il token da localStorage per l'autenticazione
                 if (!token) return;
                 const userData = await axios.get('http://localhost:3000/api/users/profile', {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 if (userData.data && userData.data._id) {
-                    setIsSaved(saved.includes(userData.data._id));
+                    setIsSaved(saved.includes(userData.data._id)); // Controlla se l'ID dell'utente è nell'array saved e aggiorna lo stato
                 }
             } catch (error) {
                 console.error('Error checking saved status:', error);
@@ -40,7 +40,7 @@ const Post = ({ post }) => {
                 });
 
                 if (userData.data && userData.data._id) {
-                    setIsLiked(likes.includes(userData.data._id));
+                    setIsLiked(likes.includes(userData.data._id)); // Controlla se l'ID dell'utente è nell'array likes e aggiorna lo stato
                 }
             } catch (error) {
                 console.error('Error checking like status:', error);
@@ -63,8 +63,9 @@ const Post = ({ post }) => {
             );
 
             if (response.data) {
-                setLikesCount(response.data.likes);
-                setIsLiked(response.data.isLiked);
+                setLikesCount(response.data.likes); // Aggiorna il conteggio dei like
+                setIsLiked(response.data.isLiked); // Aggiorna lo stato isLiked 
+                post.likes = response.data.likes; // aggiorna il campo likes
             }
         } catch (error) {
             console.error('Error liking post:', error);
@@ -72,12 +73,12 @@ const Post = ({ post }) => {
     };
 
     const handleCommentAdded = (newComment) => {
-        setPostComments([...postComments, newComment]);
+        setPostComments([...postComments, newComment]); // Aggiungi il nuovo commento alla lista dei commenti lasciando invariata la precedente tramite lo spread operator "..."
     };
 
-    // Format date to be more readable
+    // Funzione per formattare la data in modo leggibile
     const formatDate = (dateString) => {
-        const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+        const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' }; // Opzioni per formattare la data
         return new Date(dateString).toLocaleDateString(undefined, options);
     };
 
@@ -88,7 +89,7 @@ const Post = ({ post }) => {
 
             const response = await axios.post(
                 `http://localhost:3000/api/posts/${_id}/Save`,
-                {},
+                {}, // Corpo della richiesta vuoto
                 { headers: { 'Authorization': `Bearer ${token}` } }
             );
 
@@ -101,12 +102,16 @@ const Post = ({ post }) => {
         }
     };
 
+
+    // Gestione dei commenti in tempo reale tramite socket
     useEffect(() => {
+
         if (!socket) return;
+
         socket.on('new-comment', (newComment) => {
-            setPostComments(prev => [...prev, newComment]);
+            setPostComments(prev => [...prev, newComment]); // Aggiungi il nuovo commento alla lista dei commenti lasciando invariata la precedente tramite lo spread operator "..."
         });
-        return () => socket.off('new-comment');
+        return () => socket.off('new-comment'); // Pulisci il listener quando il componente si smonta o socket cambia
     }, [socket]);
 
     return (

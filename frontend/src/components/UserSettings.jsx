@@ -1,17 +1,10 @@
 import React, { useState, useEffect } from 'react';
-// Importa React e gli hook useState e useEffect
-
 import { FaCog, FaMoon, FaSun, FaBell, FaBellSlash } from 'react-icons/fa';
-// Importa diverse icone dalla libreria react-icons/fa (Font Awesome)
-
 import { getUserPreferences, saveUserPreference, PREFERENCE_TYPES } from '../utils/preferenceUtils';
-// Importa utility per gestire le preferenze utente
-
 import '../styles/UserSettings.css';
-// Importa gli stili CSS per questo componente
+
 
 const UserSettings = () => {
-  // Definizione del componente UserSettings
 
   const [showSettings, setShowSettings] = useState(false);
   // Stato per controllare la visibilità del pannello impostazioni
@@ -20,7 +13,6 @@ const UserSettings = () => {
   // Stato per memorizzare le preferenze dell'utente
 
   useEffect(() => {
-    // Effetto che si attiva quando il componente si monta
 
     // Carica le preferenze dai cookie
     setPreferences(getUserPreferences());

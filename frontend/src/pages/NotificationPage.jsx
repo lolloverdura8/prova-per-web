@@ -20,32 +20,64 @@ const NotificationsPage = () => {
             navigate('/');
         }
     }, [user, navigate]);
+    //redirect su login se non autenticato
 
-    useEffect(() => {
-        if (!user) return;
+    const fetchNotifications = async () => {
+        if (!user) return; // Se l'utente non è definito, esci dall'effetto
 
         setLoading(true);
-        setError(null);
+        setError(null); // Resetta l'errore prima di una nuova richiesta
 
         const token = localStorage.getItem('token');
-        axios.get("http://localhost:3000/api/notifications", {
-            headers: { Authorization: `Bearer ${token}` }
-        })
-            .then(res => {
-                if (!Array.isArray(res.data)) {
-                    setNotifications([]);
-                    setError("Errore nel caricamento delle notifiche");
-                    return;
-                }
-                setNotifications(res.data);
-                setError(null);
+        if (!token) { return; }
+
+        try {
+            const response = await axios.get("http://localhost:3000/api/notifications", {
+                headers: { Authorization: `Bearer ${token}` }
             })
-            .catch(err => {
+
+            if (!Array.isArray(response.data)) {
                 setNotifications([]);
                 setError("Errore nel caricamento delle notifiche");
-            })
-            .finally(() => setLoading(false));
-    }, [user]);
+                return;
+            }
+            setNotifications(response.data);
+            setError(null);
+        } catch (error) {
+            setNotifications([]);
+            setError("Errore nel caricamento delle notifiche");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+
+    useEffect(() => {
+        // .then(res => {
+        //     if (!Array.isArray(res.data)) { 
+        //         setNotifications([]);
+        //         setError("Errore nel caricamento delle notifiche");
+        //         return;
+        //     }
+        //     setNotifications(res.data);
+        //     setError(null);
+        // })
+        // .catch(err => {
+        //     setNotifications([]);
+        //     setError("Errore nel caricamento delle notifiche");
+        // })
+        // .finally(() => setLoading(false));
+        fetchNotifications();
+    }, [user]) // Effettua la richiesta quando l'utente cambia
+
+
+    useEffect(() => {
+        const onRefresh = () => {
+            fetchNotifications();
+        };
+        window.addEventListener('notifications:refresh', onRefresh);
+        return () => window.removeEventListener('notifications:refresh', onRefresh);
+    }, [fetchNotifications]);
 
     if (!user && localStorage.getItem('token')) {
         return <div className="loading">Loading...</div>;

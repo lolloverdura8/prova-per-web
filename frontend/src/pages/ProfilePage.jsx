@@ -1,32 +1,15 @@
 import React, { useEffect, useState } from "react";
-// Importa React e gli hook useEffect e useState
-
 import { useNavigate } from "react-router-dom";
-// Importa useNavigate per la navigazione programmatica
-
 import axios from 'axios';
-// Importa axios per le richieste HTTP
-
 import { useAuth } from "../context/AuthContext";
-// Importa il hook personalizzato per accedere al contesto di autenticazione
-
 import Sidebar from "../components/SideBar";
-// Importa il componente della barra laterale
-
 import Navbar from "../components/NavBar";
-// Importa il componente della barra di navigazione
-
 import Post from "../components/Post";
-// Importa il componente per visualizzare un singolo post
-
 import { FaEdit, FaCheck, FaTimes } from "react-icons/fa";
-// Importa le icone da react-icons
-
 import "../styles/ProfilePage.css";
-// Importa gli stili CSS per la pagina profilo
+
 
 const ProfilePage = () => {
-    // Definizione del componente ProfilePage
 
     const { user, setUser } = useAuth();
     // Estrae l'utente e la funzione per aggiornarlo dal contesto di autenticazione
@@ -55,7 +38,7 @@ const ProfilePage = () => {
     useEffect(() => {
         // Effetto che si attiva al caricamento della pagina o quando user o navigate cambiano
 
-        // Redirect to login if not authenticated
+        // redirect su login se non autenticato
         if (!user && !localStorage.getItem('token')) {
             // Se non c'è un utente autenticato e non c'è un token nel localStorage
 
@@ -89,25 +72,21 @@ const ProfilePage = () => {
             // Resetta eventuali errori precedenti
 
             try {
-                // Tenta di eseguire la richiesta
 
                 // Utilizziamo l'endpoint di filtro per ottenere i post dell'utente
                 const response = await axios.get(`http://localhost:3000/api/posts/filter?author=${user.username}`);
                 // Invia una richiesta GET all'endpoint di filtro, specificando l'username come autore
 
                 if (response.data) {
-                    // Se la risposta contiene dati
 
                     setUserPosts(response.data);
                     // Aggiorna lo stato con i post dell'utente
                 } else {
-                    // Se la risposta non contiene dati
 
                     setUserPosts([]);
                     // Imposta un array vuoto
                 }
             } catch (error) {
-                // Se la richiesta fallisce
 
                 console.error('Error fetching user posts:', error);
                 // Logga l'errore nella console
@@ -115,7 +94,6 @@ const ProfilePage = () => {
                 setError('Impossibile caricare i tuoi post. Riprova più tardi.');
                 // Imposta un messaggio di errore per l'utente
             } finally {
-                // Eseguito indipendentemente dal risultato della richiesta
 
                 setLoading(false);
                 // Termina lo stato di caricamento
@@ -155,6 +133,7 @@ const ProfilePage = () => {
                     }
                 }
             );
+            //Uso put e non post perché sto aggiornando un dato esistente
 
             // Aggiorna l'utente nel contesto
             if (response.data) {
@@ -176,14 +155,11 @@ const ProfilePage = () => {
         }));
     };
 
-    // If still checking authentication status, show loading
     if (!user && localStorage.getItem('token')) {
         // Se c'è un token ma l'utente non è ancora caricato (autenticazione in corso)
-
         return <div className="loading">Loading...</div>;
         // Mostra un indicatore di caricamento
     }
-
     return (
         <div className="home-container">
             {/* Contenitore principale con lo stesso stile della home */}
@@ -202,15 +178,6 @@ const ProfilePage = () => {
 
                     <div className="profile-info">
                         {/* Colonna di sinistra con le informazioni dell'utente */}
-
-                        <div className="profile-avatar">
-                            {/* Avatar dell'utente */}
-                            <img
-                                src={user?.avatar || '/path/to/default-avatar.png'}
-                                alt={`Avatar di ${user?.username}`}
-                                className="avatar-image"
-                            />
-                        </div>
 
                         {editMode ? (
                             <div className="profile-edit-form">
@@ -293,12 +260,10 @@ const ProfilePage = () => {
                             <div className="loading-container">Caricamento post...</div>
                             // Mostra un indicatore di caricamento
                         ) : error ? (
-                            // Se c'è un errore
 
                             <div className="error-container">{error}</div>
-                            // Mostra il messaggio di errore
+
                         ) : userPosts.length > 0 ? (
-                            // Se ci sono post da mostrare
 
                             <div className="user-post-list">
                                 {/* Contenitore per la lista dei post */}

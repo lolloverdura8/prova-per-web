@@ -51,9 +51,9 @@
 //                     headers: { 'Authorization': `Bearer ${token}` }
 //                 }
 //             );
-            
+
 //             resetForm();
-            
+
 //             if (onPostCreated) {
 //                 onPostCreated(response.data);
 //             }
@@ -77,7 +77,7 @@
 //                         maxLength={1000} 
 //                     />
 //                 </div>
-                
+
 //                 <div className="input-area tags-input">
 //                     <input 
 //                         type="text" 
@@ -87,13 +87,13 @@
 //                     />
 //                     <small className="helper-text">Esempio: musica, sport, tecnologia</small>
 //                 </div>
-                
+
 //                 {error && (
 //                     <p className="error-message">
 //                         <FaExclamationCircle /> {error}
 //                     </p>
 //                 )}
-                
+
 //                 <div className="post-actions">
 //                     <button 
 //                         type="button" 
@@ -159,7 +159,7 @@ const CreatePost = ({ onPostCreated }) => {
             const tokenFromCookie = authCookies.getAuthToken();
             const tokenFromStorage = localStorage.getItem('token');
             const token = tokenFromCookie || tokenFromStorage;
-            
+
             if (!token) {
                 setError('Devi essere loggato per creare un post');
                 setLoading(false);
@@ -168,19 +168,19 @@ const CreatePost = ({ onPostCreated }) => {
 
             const postData = {
                 description,
-                tags: tagArray.length > 0 ? tagArray : undefined
+                tags: tagArray.length > 0 ? tagArray : undefined // Invia i tag solo se l'array non è vuoto 
             };
 
             const response = await axios.post(
-                'http://localhost:3000/api/posts', 
-                postData, 
+                'http://localhost:3000/api/posts',
+                postData,
                 {
                     headers: { 'Authorization': `Bearer ${token}` }
                 }
             );
-            
+
             resetForm();
-            
+
             if (onPostCreated) {
                 onPostCreated(response.data);
             }
@@ -203,32 +203,32 @@ const CreatePost = ({ onPostCreated }) => {
                     <textarea
                         placeholder="Cosa stai pensando?"
                         value={description}
-                        onChange={(e) => setDescription(e.target.value)} 
+                        onChange={(e) => setDescription(e.target.value)}
                         maxLength={1000}
                         autoFocus
                     />
                 </div>
-                
+
                 <div className="input-area tags-input">
-                    <input 
-                        type="text" 
-                        placeholder="Aggiungi tag (separati da virgola)" 
+                    <input
+                        type="text"
+                        placeholder="Aggiungi tag (separati da virgola)"
                         value={tags}
                         onChange={(e) => setTags(e.target.value)}
                     />
                     <small className="helper-text">Esempio: musica, sport, tecnologia</small>
                 </div>
-                
+
                 {error && (
                     <p className="error-message">
                         <FaExclamationCircle /> {error}
                     </p>
                 )}
-                
+
                 <div className="post-actions">
-                    <button 
-                        type="submit" 
-                        className="post-button" 
+                    <button
+                        type="submit"
+                        className="post-button"
                         disabled={loading}
                     >
                         {loading ? 'Pubblicando...' : (

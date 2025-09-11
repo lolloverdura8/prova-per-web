@@ -66,7 +66,7 @@ const Autocomplete = ({
   // L'effetto si riattiva quando inputValue o options cambiano
 
   useEffect(() => {
-    // Close suggestions when clicking outside
+    // gestione click esterni per chiudere il menu dei suggerimenti
     const handleClickOutside = (e) => {
       // Funzione per gestire i click all'esterno del componente
 
@@ -216,7 +216,7 @@ const Autocomplete = ({
 
             <div
               key={index}
-              // Key unica per React
+              // Chiave unica per ogni opzione (usa l'indice come fallback)
 
               className={`autocomplete-item ${index === highlightedIndex ? 'highlighted' : ''}`}
               // Classe CSS condizionale: aggiunge 'highlighted' se l'opzione è evidenziata

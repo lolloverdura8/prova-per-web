@@ -3,68 +3,73 @@ import { io } from "socket.io-client";
 import { useAuth } from "./AuthContext";
 import axios from "axios";
 
-const SocketContext = createContext(null);
-export const useSocket = () => useContext(SocketContext);
+const SocketContext = createContext(null); // Inizializza con null
+export const useSocket = () => useContext(SocketContext); // Hook personalizzato per usare il contesto
 
 export const SocketProvider = ({ children }) => {
     console.log("SocketProvider montato!");
     const auth = useAuth();
     const user = auth ? auth.user : null;
-    const socketRef = useRef(null);
-    const [hasUnreadNotifications, setHasUnreadNotifications] = useState(false);
+    const socketRef = useRef(null); // Crea un ref per memorizzare l'istanza socket (socketRef.current), così da poterla leggere/modificare senza provocare rerender.
+    const [hasUnreadNotifications, setHasUnreadNotifications] = useState(false); // Stato per notifiche non lette
 
     // Segna tutte le notifiche come lette
     const markAllNotificationsAsRead = async () => {
         try {
-            const token = localStorage.getItem('token');
+            const token = localStorage.getItem('token'); // Ottieni il token da localStorage
             await axios.post("http://localhost:3000/api/notifications/read-all", {}, {
-                headers: { Authorization: `Bearer ${token}` }
+                headers: { Authorization: `Bearer ${token}` } // Includi il token nell'header di autorizzazione 
             });
-            setHasUnreadNotifications(false);
+            setHasUnreadNotifications(false); // Aggiorna lo stato locale
         } catch (error) {
             console.error("Errore nel segnare le notifiche come lette:", error);
         }
+        // Viene fatta una post al backend per segnare tutte le notifiche come lette, chiamando l'endpoint apposito nel backend, poi si aggiorna lo stato locale.
     };
 
     // Controllo iniziale notifiche non lette
     useEffect(() => {
         const checkUnreadNotifications = async () => {
-            if (user && user.id) {
+            if (user && user._id) {
                 try {
                     const token = localStorage.getItem('token');
                     const response = await axios.get("http://localhost:3000/api/notifications", {
                         headers: { Authorization: `Bearer ${token}` }
                     });
-                    const hasUnread = response.data.some(n => !n.isRead);
-                    setHasUnreadNotifications(hasUnread);
+                    const hasUnread = response.data.some(n => !n.isRead); // Controlla se c'è almeno una notifica non letta, setta hasUnread su true/false
+                    setHasUnreadNotifications(hasUnread); // Aggiorna lo stato di hasUnreadNotifications
                 } catch (error) {
                     console.error("Errore nel controllo notifiche non lette:", error);
                 }
             }
         };
-        checkUnreadNotifications();
-    }, [user]);
+        checkUnreadNotifications(); // Esegui il controllo iniziale
+    }, [user]); // Esegui l'effetto ogni volta che cambia l'utente
 
     // Socket realtime
     useEffect(() => {
         console.log("useEffect SocketProvider, user:", user);
+        // Effetto che si attiva quando cambia l'utente (login/logout), per gestire la connessione socket
         if (user && user._id) {
-            socketRef.current = io("http://localhost:3000");
-            socketRef.current.on("connect", () => {
+            socketRef.current = io("http://localhost:3000"); // Connetti al server Socket.IO
+            socketRef.current.on("connect", () => { // Evento di connessione riuscita
                 console.log("Socket connesso!", socketRef.current.id);
-                socketRef.current.emit("join", user._id);
+                socketRef.current.emit("join", user._id); // Unisciti a una stanza specifica per l'utente
                 console.log("Join stanza", user._id);
             });
+            // socketRef è il riferimento all'istanza socket, usiamo socketRef.current per accedere all'istanza effettiva e registrare gli eventi e inviare messaggi. 
 
             socketRef.current.on("new-notification", (notifica) => {
-                console.log("Ricevuta notifica realtime!", notifica);
+                console.log("Ricevuta notifica realtime!", notifica); //log di debug
                 setHasUnreadNotifications(true);
             });
+            // Ascolta l'evento di nuova notifica e aggiorna lo stato delle notifiche non lette
         }
         return () => {
             if (socketRef.current) {
-                socketRef.current.disconnect();
-                socketRef.current = null;
+                socketRef.current.disconnect(); // Disconnetti il socket quando il componente si smonta o l'utente cambia
+                socketRef.current = null; // Pulisci il ref
+                console.log("Socket disconnesso");
             }
         };
     }, [user]);

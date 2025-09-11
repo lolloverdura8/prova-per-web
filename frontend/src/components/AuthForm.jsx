@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-// Importa React e l'hook useState
+
 
 import "../styles/AuthForm.css";
-// Importa gli stili CSS per il form di autenticazione
+
 
 const AuthForm = ({ isRegister, onToggle, onSubmit, error }) => {
     // Definizione del componente AuthForm che accetta diverse props:

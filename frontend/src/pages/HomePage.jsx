@@ -1,33 +1,14 @@
 import React, { useEffect, useState } from "react";
-// Importa React e gli hook useEffect e useState
-
 import { useNavigate } from "react-router-dom";
-// Importa useNavigate per la navigazione programmatica tra le pagine
-
 import { useAuth } from "../context/AuthContext";
-// Importa il hook personalizzato per accedere al contesto di autenticazione
-
 import Sidebar from "../components/SideBar";
-// Importa il componente della barra laterale
-
 import Navbar from "../components/NavBar";
-// Importa il componente della barra di navigazione
-
 import PostList from "../components/PostList";
-// Importa il componente che mostra la lista dei post
-
 import FloatingActionButton from "../components/FloatingActionButton";
-// Importa il pulsante flottante per creare nuovi post
-
 import PostModal from "../components/PostModal";
-// Importa il componente modal per la creazione di post
-
 import "../styles/HomePage.css";
-// Importa gli stili CSS per la home page
 
 const Home = () => {
-    // Definizione del componente Home come una funzione
-
     const { user } = useAuth();
     // Estrae l'utente dal contesto di autenticazione
 
@@ -53,7 +34,6 @@ const Home = () => {
     }, [user, navigate]);
     // L'effetto si riattiva quando l'utente o la funzione di navigazione cambiano
 
-    // If still checking authentication status, show loading
     if (!user && localStorage.getItem('token')) {
         // Se c'è un token ma l'utente non è ancora caricato (autenticazione in corso)
 
@@ -64,9 +44,8 @@ const Home = () => {
     const handlePostCreated = (newPost) => {
         // Funzione chiamata quando viene creato un nuovo post
 
-        // Trigger a refresh of the post list
         setRefreshPosts(prev => !prev);
-        // Inverte il valore di refreshPosts per forzare l'aggiornamento della lista
+        // Inverte il valore di refreshPosts per forzare l'aggiornamento della lista, prev è il valore precedente
     };
 
     const openPostModal = () => {

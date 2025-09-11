@@ -1,27 +1,13 @@
-// /src/pages/LoginPage.jsx
 import React from "react";
-// Importa React per poter utilizzare JSX
-
 import '../styles/LoginPage.css'
-// Importa lo stile specifico per la pagina di login
-
-import "../styles/Global.css"; // Importiamo lo stile globale   
-// Importa lo stile globale dell'applicazione
-
+import "../styles/Global.css";
 import AuthForm from "../components/AuthForm";
-// Importa il componente del form di autenticazione
-
 import { useState } from "react";
-// Importa l'hook useState per gestire lo stato locale del componente
-
 import { useNavigate } from 'react-router-dom';
-// Importa useNavigate per navigare programmaticamente tra le pagine
-
 import { useAuth } from '../context/AuthContext';
-// Importa il hook personalizzato per accedere al contesto di autenticazione
+
 
 const LoginPage = () => {
-    // Definizione del componente della pagina di login
 
     const [isRegister, setIsRegister] = useState(false)
     // Stato per determinare se mostrare il form di registrazione o login
@@ -30,7 +16,7 @@ const LoginPage = () => {
     const navigate = useNavigate();
     // Inizializza la funzione di navigazione
 
-    const { setUser } = useAuth();
+    const { login, register } = useAuth();
     // Estrae la funzione setUser dal contesto di autenticazione
 
     const switchForm = () => {
@@ -40,71 +26,35 @@ const LoginPage = () => {
         // Inverte lo stato isRegister (da login a registrazione o viceversa)
     }
 
-    const handleSubmit = async (formData) => {
-        // Funzione asincrona per gestire l'invio del form
-
-        const url = isRegister ? '/register' : '/login';
-        // Seleziona l'URL corretto in base al tipo di form (registrazione o login)
-
+    const handleFormSubmit = async (formData) => {
+        // Funzione per gestire l'invio del form di login o registrazione
+        // formData contiene i dati inseriti nel form
         try {
-            // Tenta di eseguire una richiesta al server
-
-            const response = await fetch(`http://localhost:3000/api/users${url}`, {
-                // Esegue una richiesta HTTP all'endpoint appropriato
-
-                method: 'POST',
-                // Usa il metodo POST
-
-                headers: {
-                    'Content-Type': 'application/json'
-                    // Imposta l'header per indicare che il corpo è in formato JSON
-                },
-
-                body: JSON.stringify(formData),
-                // Converte i dati del form in formato JSON
-            });
-
-            const result = await response.json();
-            // Attende e converte la risposta in formato JSON
-
-            if (response.ok) {
-                // Se la richiesta ha avuto successo
-
-                if (isRegister) {
-                    // Se era una registrazione
-
-                    alert('Registrazione completata con successo!');
-                    // Mostra un messaggio di successo
-
-                    setIsRegister(false); // Switch to login form
-                    // Passa al form di login
+            if (isRegister) {
+                // Se siamo in modalità registrazione
+                const result = await register(formData);
+                if (result.success) {
+                    // Se la registrazione ha successo, naviga alla pagina principale
+                    console.log("Registrazione avvenuta con successo");
+                    navigate('/home');
                 } else {
-                    // Se era un login
-
-                    // Store token in localStorage
-                    localStorage.setItem('token', result.token);
-                    // Salva il token nel localStorage
-
-                    setUser(result.user);
-                    // Imposta l'utente nel contesto di autenticazione
-
-                    navigate('/home')
-                    // Naviga alla home page
+                    alert("Errore nella registrazione. Riprova.");
                 }
             } else {
-                // Se la richiesta non ha avuto successo
-
-                alert(result.message || 'Errore durante l\'operazione');
-                // Mostra un messaggio di errore
+                // Se siamo in modalità login
+                const result = await login(formData);
+                if (result.success) {
+                    // Se il login ha successo, naviga alla pagina principale
+                    console.log("Login avvenuto con successo");
+                    navigate('/home');
+                } else {
+                    alert("Credenziali non valide. Riprova.");
+                }
             }
+
         } catch (error) {
-            // Gestisce eventuali errori durante la richiesta
-
-            console.error('Errore durante la richiesta:', error);
-            // Logga l'errore nella console
-
-            alert('Errore di connessione al server');
-            // Mostra un messaggio di errore all'utente
+            console.error("Errore durante il login/registrazione:", error);
+            alert("Errore durante il login/registrazione. Controlla le credenziali e riprova.");
         }
     }
 
@@ -112,7 +62,7 @@ const LoginPage = () => {
         <div className="login-container">
             {/* Contenitore principale della pagina di login */}
 
-            <AuthForm isRegister={isRegister} onToggle={switchForm} onSubmit={handleSubmit} />
+            <AuthForm isRegister={isRegister} onToggle={switchForm} onSubmit={handleFormSubmit} />
             {/* Renderizza il form di autenticazione passando:
                 - se è in modalità registrazione o login
                 - la funzione per cambiare modalità
@@ -123,4 +73,3 @@ const LoginPage = () => {
 };
 
 export default LoginPage;
-// Esporta il componente per poterlo utilizzare in altri file

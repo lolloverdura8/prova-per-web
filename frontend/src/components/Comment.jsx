@@ -9,11 +9,12 @@ const Comments = ({ comments = [] }) => {
     return (
         <div className="comments-section">
             <h4>Comments</h4>
+            {/* Lista dei commenti */}
             {comments.map((comment, index) => (
                 <div key={index} className="comment">
                     <div className="comment-header">
                         <div className="comment-author-info">
-                            <span className="comment-author">{comment.user?.username}</span>
+                            <span className="comment-author">{comment.user?.username}</span> {/* Usa l'operatore di chaining opzionale per evitare errori se user è undefined */}
                         </div>
                         <span className="comment-date">
                             {new Date(comment.createdAt).toLocaleDateString()}

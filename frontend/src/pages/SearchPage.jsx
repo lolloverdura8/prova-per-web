@@ -1,29 +1,14 @@
 import React, { useState, useEffect } from "react";
-// Importa React e gli hook useState e useEffect
-
 import { useNavigate } from "react-router-dom";
-// Importa useNavigate per la navigazione programmatica
-
 import axios from "axios";
-// Importa axios per le richieste HTTP
-
 import Sidebar from "../components/SideBar";
-// Importa il componente della barra laterale
-
 import Navbar from "../components/NavBar";
-// Importa il componente della barra di navigazione superiore
-
 import Post from "../components/Post";
-// Importa il componente per visualizzare un singolo post
-
 import { FaSearch, FaTimes } from "react-icons/fa";
-// Importa le icone di ricerca e chiusura da react-icons
-
 import "../styles/SearchPage.css";
-// Importa gli stili CSS per la pagina di ricerca
+
 
 const SearchPage = () => {
-    // Definizione del componente della pagina di ricerca
 
     const [searchQuery, setSearchQuery] = useState("");
     // Stato per memorizzare la query di ricerca inserita dall'utente
@@ -80,10 +65,9 @@ const SearchPage = () => {
         try {
             // Tenta di eseguire la richiesta di ricerca
 
-            const response = await axios.get(`http://localhost:3000/api/posts/search?query=${encodeURIComponent(searchQuery)}`);
+            const response = await axios.get(`http://localhost:3000/api/posts/search?query=${encodeURIComponent(searchQuery)}`); // econdedURIComponent serve per codificare correttamente la query poiché potrebbe contenere caratteri speciali
             // Invia la richiesta GET all'API con la query codificata nell'URL
 
-            // Assicuriamoci che i commenti abbiano informazioni complete sugli utenti
             const posts = response.data;
             // Estrae i post dalla risposta
 
@@ -122,13 +106,10 @@ const SearchPage = () => {
             setSearchResults(populatedPosts);
             // Aggiorna lo stato con i post trovati e popolati
         } catch (error) {
-            // Se la ricerca fallisce
 
             console.error("Errore durante la ricerca:", error);
-            // Logga l'errore nella console
 
             setError("Si è verificato un errore durante la ricerca. Riprova più tardi.");
-            // Imposta un messaggio di errore
 
             setSearchResults([]);
             // Resetta i risultati
@@ -254,4 +235,3 @@ const SearchPage = () => {
 };
 
 export default SearchPage;
-// Esporta il componente per poterlo utilizzare in altri file

@@ -64,7 +64,7 @@ const Sidebar = () => {
     const handleNotificationClick = async () => {
         await markAllNotificationsAsRead();
         // Segna tutte le notifiche come lette
-
+        window.dispatchEvent(new CustomEvent('notifications:refresh')); // Event per aggiornare le notifiche in altre parti dell'app
         navigate('/notifications');
         // Naviga alla pagina delle notifiche
     };

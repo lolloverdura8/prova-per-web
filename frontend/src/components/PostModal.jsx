@@ -3,44 +3,51 @@ import { FaPencilAlt, FaTimes } from 'react-icons/fa';
 import CreatePost from './CreatePost';
 import '../styles/PostModal.css';
 
+// Componente modal per creare un nuovo post
+
 const PostModal = ({ isOpen, onClose, onPostCreated }) => {
-  const modalRef = useRef(null);
-  
-  // Close when clicking outside the modal
+  const modalRef = useRef(null); // Ref per il contenitore del modal
+
+  // gestione click esterni al modal
+
+  // chiudi il modal se si clicca fuori
   const handleBackdropClick = (e) => {
     if (modalRef.current && !modalRef.current.contains(e.target)) {
       onClose();
     }
   };
-  
-  // Handle escape key press
+
+  // gestione tasto ESC e scroll del body
   useEffect(() => {
     const handleEscape = (e) => {
       if (e.key === 'Escape') {
         onClose();
       }
     };
-    
+
+    // Aggiungi o rimuovi listener e gestisci lo scroll del body
     if (isOpen) {
       document.addEventListener('keydown', handleEscape);
-      // Prevent body scroll when modal is open
+      // previeni lo scroll del body quando il modal è aperto
       document.body.style.overflow = 'hidden';
     }
-    
+
+    // Pulizia all'unmount o quando isOpen cambia
     return () => {
       document.removeEventListener('keydown', handleEscape);
       document.body.style.overflow = 'visible';
     };
+
   }, [isOpen, onClose]);
-  
+
   if (!isOpen) return null;
-  
+
   return (
-    <div 
+    <div
       className="modal-overlay"
       onClick={handleBackdropClick}
     >
-      <div 
+      <div
         className="modal-container"
         ref={modalRef}
       >
@@ -48,7 +55,7 @@ const PostModal = ({ isOpen, onClose, onPostCreated }) => {
           <h3 className="modal-title">
             <FaPencilAlt /> Crea nuovo post
           </h3>
-          <button 
+          <button
             className="close-button"
             onClick={onClose}
             aria-label="Close"
@@ -57,11 +64,11 @@ const PostModal = ({ isOpen, onClose, onPostCreated }) => {
           </button>
         </div>
         <div className="modal-body">
-          <CreatePost 
+          <CreatePost
             onPostCreated={(post) => {
               onPostCreated(post);
               onClose();
-            }} 
+            }}
           />
         </div>
       </div>

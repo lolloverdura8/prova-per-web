@@ -21,8 +21,8 @@ module.exports = {
 
     async markNotificationAsRead(req, res) {
         try {
-            const notificationId = req.params.id; // <-- correzione: req.params.id, non destrutturare
-            const userId = req.user.id; // <-- usa sempre .id
+            const notificationId = req.params.id;
+            const userId = req.user.id;
 
             const notification = await Notification.findOneAndUpdate(
                 { _id: notificationId, userId: mongoose.Types.ObjectId(userId) },

@@ -16,7 +16,7 @@ const Saved = () => {
     const [isPostModalOpen, setIsPostModalOpen] = useState(false);
 
     // Redirect se non autenticato
-    React.useEffect(() => {
+    useEffect(() => {
         if (!user && !localStorage.getItem('token')) {
             navigate('/');
         }
@@ -24,6 +24,7 @@ const Saved = () => {
 
     if (!user && localStorage.getItem('token')) {
         return <div className="loading">Loading...</div>;
+        // Mostra un indicatore di caricamento se l'utente non è ancora caricato
     }
 
     const handlePostCreated = () => setRefreshPosts(prev => !prev);

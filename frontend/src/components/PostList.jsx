@@ -47,13 +47,11 @@ const PostList = ({ refreshTrigger, savedMode }) => {
         // Resetta eventuali errori precedenti
 
         try {
-            // Tenta di eseguire la richiesta
 
             const response = await axios.get('http://localhost:3000/api/posts');
             // Invia una richiesta GET all'endpoint dei post
 
             if (response.data) {
-                // Se la risposta contiene dati
 
                 setPosts(response.data);
                 // Aggiorna lo stato dei post con i dati ricevuti
@@ -61,10 +59,10 @@ const PostList = ({ refreshTrigger, savedMode }) => {
                 setFilteredPosts(response.data);
                 // Inizialmente, i post filtrati sono gli stessi di tutti i post
 
-                // Estrai autori e tag unici per i filtri
-                const authors = [...new Set(response.data
+
+                const authors = [...new Set(response.data //Set è una struttura dati che memorizza valori unici
                     .map(post => post.author?.username)
-                    .filter(Boolean))];
+                    .filter(Boolean) /* Filtra valori null/undefined*/)];
                 // Estrae gli autori unici dai post
 
                 setUniqueAuthors(authors);
@@ -79,13 +77,9 @@ const PostList = ({ refreshTrigger, savedMode }) => {
                 // Aggiorna lo stato dei tag unici
             } else {
                 // Se la risposta non contiene dati
-
                 setError('No posts found');
-                // Imposta un messaggio di errore
             }
         } catch (error) {
-            // Se la richiesta fallisce
-
             console.error('Error fetching posts:', error);
             // Logga l'errore nella console
 
@@ -97,98 +91,96 @@ const PostList = ({ refreshTrigger, savedMode }) => {
         }
     };
 
-    // Carica post filtrati dal server
-    const fetchFilteredPosts = async () => {
-        // Funzione asincrona per recuperare i post filtrati dal server
+    // Carica post filtrati
+    // const fetchFilteredPosts = async () => {
+    //     // Funzione asincrona per recuperare i post filtrati dal server
 
-        setLoading(true);
-        // Imposta lo stato di caricamento
+    //     setLoading(true);
+    //     // Imposta lo stato di caricamento
 
-        setError('');
-        // Resetta eventuali errori precedenti
+    //     setError('');
+    //     // Resetta eventuali errori precedenti
 
-        try {
-            // Tenta di eseguire la richiesta
+    //     try {
 
-            // Costruisci l'URL con i parametri di query in base ai filtri attivi
-            let url = 'http://localhost:3000/api/posts/filter';
-            // URL base per l'endpoint di filtro
+    //         // Costruisci l'URL con i parametri di query in base ai filtri attivi
+    //         let url = 'http://localhost:3000/api/posts/filter';
+    //         // URL base per l'endpoint di filtro
 
-            const params = new URLSearchParams();
-            // Crea un oggetto URLSearchParams per costruire i parametri della query
+    //         const params = new URLSearchParams();
+    //         // Crea un oggetto URLSearchParams per costruire i parametri della query
 
-            if (userFilter) params.append('author', userFilter);
-            // Se c'è un filtro utente, aggiungilo ai parametri
+    //         if (userFilter) params.append('author', userFilter);
+    //         // Se c'è un filtro utente, aggiungilo ai parametri
 
-            if (dateFilter) params.append('date', dateFilter);
-            // Se c'è un filtro data, aggiungilo ai parametri
+    //         if (dateFilter) params.append('date', dateFilter);
+    //         // Se c'è un filtro data, aggiungilo ai parametri
 
-            if (tagFilter) params.append('tag', tagFilter);
-            // Se c'è un filtro tag, aggiungilo ai parametri
+    //         if (tagFilter) params.append('tag', tagFilter);
+    //         // Se c'è un filtro tag, aggiungilo ai parametri
 
-            // Aggiungi i parametri all'URL solo se ce ne sono
-            const queryString = params.toString();
-            // Converte i parametri in una stringa di query
+    //         // Aggiungi i parametri all'URL solo se ce ne sono
+    //         const queryString = params.toString();
+    //         // Converte i parametri in una stringa di query
 
-            if (queryString) {
-                url += '?' + queryString;
-                // Aggiunge la stringa di query all'URL
-            }
+    //         if (queryString) {
+    //             url += '?' + queryString;
+    //             // Aggiunge la stringa di query all'URL
+    //         }
 
-            console.log("Invio richiesta filtrata a:", url);
-            // Logga l'URL per debug
+    //         console.log("Invio richiesta filtrata a:", url);
+    //         // Logga l'URL per debug
 
-            const response = await axios.get(url);
-            // Invia una richiesta GET all'URL con i filtri
+    //         const response = await axios.get(url);
+    //         // Invia una richiesta GET all'URL con i filtri
 
-            console.log("Risposta dal server:", response.data);
-            // Logga la risposta per debug
+    //         console.log("Risposta dal server:", response.data);
+    //         // Logga la risposta per debug
 
-            if (response.data) {
-                // Se la risposta contiene dati
+    //         if (response.data) {
+    //             // Se la risposta contiene dati
 
-                setFilteredPosts(response.data);
-                // Aggiorna lo stato dei post filtrati
+    //             setFilteredPosts(response.data);
+    //             // Aggiorna lo stato dei post filtrati
 
-                if (response.data.length === 0) {
-                    // Se non ci sono risultati
+    //             if (response.data.length === 0) {
+    //                 // Se non ci sono risultati
 
-                    // Non è un errore, solo nessun risultato
-                    console.log("Nessun post corrisponde ai filtri");
-                    // Logga un messaggio per debug
-                }
-            } else {
-                // Se la risposta non contiene dati
+    //                 // Non è un errore, solo nessun risultato
+    //                 console.log("Nessun post corrisponde ai filtri");
+    //                 // Logga un messaggio per debug
+    //             }
+    //         } else {
+    //             // Se la risposta non contiene dati
 
-                setFilteredPosts([]);
-                // Imposta un array vuoto
+    //             setFilteredPosts([]);
+    //             // Imposta un array vuoto
 
-                setError('Nessun post trovato');
-                // Imposta un messaggio di errore
-            }
-        } catch (error) {
-            // Se la richiesta fallisce
+    //             setError('Nessun post trovato');
+    //             // Imposta un messaggio di errore
+    //         }
+    //     } catch (error) {
+    //         // Se la richiesta fallisce
 
-            console.error('Error fetching filtered posts:', error);
-            // Logga l'errore nella console
+    //         console.error('Error fetching filtered posts:', error);
+    //         // Logga l'errore nella console
 
-            setError(`Impossibile caricare i post filtrati: ${error.message}`);
-            // Imposta un messaggio di errore dettagliato
+    //         setError(`Impossibile caricare i post filtrati: ${error.message}`);
+    //         // Imposta un messaggio di errore dettagliato
 
-            setFilteredPosts([]);
-            // Resetta i post filtrati
-        } finally {
-            setLoading(false);
-            // Termina lo stato di caricamento indipendentemente dal risultato
-        }
-    };
+    //         setFilteredPosts([]);
+    //         // Resetta i post filtrati
+    //     } finally {
+    //         setLoading(false);
+    //         // Termina lo stato di caricamento indipendentemente dal risultato
+    //     }
+    // };
 
-    // Carica i post quando il componente si monta o il trigger di aggiornamento cambia
+    //effetto per caricare i post salvati
     useEffect(() => {
-        // Effetto che si attiva quando il componente si monta o refreshTrigger cambia
+        // Effetto che si attiva quando il componente si monta o refresh
 
         if (savedMode) {
-            // Se siamo nella modalità salvati
 
             const fetchSavedPosts = async () => {
                 // Funzione per recuperare i post salvati
@@ -200,17 +192,16 @@ const PostList = ({ refreshTrigger, savedMode }) => {
                 // Resetta eventuali errori precedenti
 
                 try {
-                    // Tenta di eseguire la richiesta
+                    const token = localStorage.getItem('token');
 
                     const response = await axios.get('http://localhost:3000/api/posts/saved', {
                         headers: {
-                            Authorization: `Bearer ${localStorage.getItem('token')}`
+                            Authorization: `Bearer ${token}` // Includi il token nell'header di autorizzazione per evitare errori 401
                         }
                     });
                     // Invia una richiesta GET all'endpoint dei post salvati
 
                     if (response.data) {
-                        // Se la risposta contiene dati
 
                         setPosts(response.data);
                         // Aggiorna lo stato dei post con i dati ricevuti
@@ -235,19 +226,14 @@ const PostList = ({ refreshTrigger, savedMode }) => {
                         setUniqueTags(tags);
                         // Aggiorna lo stato dei tag unici
                     } else {
-                        // Se la risposta non contiene dati
 
                         setError('No saved posts found');
-                        // Imposta un messaggio di errore
                     }
                 } catch (error) {
-                    // Se la richiesta fallisce
 
                     console.error('Error fetching saved posts:', error);
-                    // Logga l'errore nella console
 
                     setError('Failed to load saved posts. Please try again later.');
-                    // Imposta un messaggio di errore per l'utente
                 } finally {
                     setLoading(false);
                     // Termina lo stato di caricamento indipendentemente dal risultato
@@ -265,22 +251,22 @@ const PostList = ({ refreshTrigger, savedMode }) => {
     }, [refreshTrigger, savedMode]);
     // L'effetto si riattiva quando refreshTrigger o savedMode cambiano
 
-    // Applica i filtri (ora chiama il backend invece di filtrare localmente)
+    // Applica i filtri (ora chiama il backend invece di filtrare localmente) 
     useEffect(() => {
         setLoading(true);
         setError('');
 
-        const params = new URLSearchParams();
-        if (userFilter) params.append('author', userFilter);
-        if (dateFilter) params.append('date', dateFilter);
-        if (tagFilter) params.append('tag', tagFilter);
+        const params = new URLSearchParams(); // Crea un oggetto URLSearchParams per costruire i parametri della query
+        if (userFilter) params.append('author', userFilter); // Se c'è un filtro utente, aggiungilo ai parametri
+        if (dateFilter) params.append('date', dateFilter); // Se c'è un filtro data, aggiungilo ai parametri
+        if (tagFilter) params.append('tag', tagFilter); // Se c'è un filtro tag, aggiungilo ai parametri
 
-        let url;
-        let headers = {};
+        let url; // URL base per l'endpoint di filtro
+        let headers = {}; // Intestazioni della richiesta
         if (savedMode) {
             // Siamo nella pagina "Salvati"
             url = `http://localhost:3000/api/posts/saved/filter`;
-            const token = localStorage.getItem('token');
+            const token = localStorage.getItem('token'); // Ottieni il token da localStorage
             if (token) headers['Authorization'] = `Bearer ${token}`;
         } else {
             // Siamo in homepage
@@ -294,9 +280,9 @@ const PostList = ({ refreshTrigger, savedMode }) => {
                 axios.get('http://localhost:3000/api/posts/saved', { headers })
                     .then(response => {
                         setFilteredPosts(response.data);
-                        const authors = [...new Set(response.data.map(post => post.author?.username).filter(Boolean))];
+                        const authors = [...new Set(response.data.map(post => post.author?.username).filter(Boolean))]; //map estra in base a return della callback
                         setUniqueAuthors(authors);
-                        const tags = [...new Set(response.data.flatMap(post => post.tags || []).filter(Boolean))];
+                        const tags = [...new Set(response.data.flatMap(post => post.tags || []).filter(Boolean))]; //flatMap appiattisce l'array di array in un singolo array
                         setUniqueTags(tags);
                     })
                     .catch(error => {
@@ -304,6 +290,19 @@ const PostList = ({ refreshTrigger, savedMode }) => {
                         setFilteredPosts([]);
                     })
                     .finally(() => setLoading(false));
+
+                //esempio di chiamata alternativa con async/await
+                // const response = await axios.get('http://localhost:3000/api/posts/saved', { headers });
+                // if (response.data) {
+                //     setFilteredPosts(response.data);
+                //     const authors = [...new Set(response.data.map(post => post.author?.username).filter(Boolean))]; //map estra in base a return della callback
+                //     setUniqueAuthors(authors);
+                //     const tags = [...new Set(response.data.flatMap(post => post.tags || []).filter(Boolean))]; //flatMap appiattisce l'array di array in un singolo array
+                //     setUniqueTags(tags);
+                // } else {
+                //     setError('No saved posts found');
+                // }
+
             } else {
                 // Lista completa di tutti i post
                 axios.get('http://localhost:3000/api/posts')
