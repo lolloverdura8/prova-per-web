@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from 'axios';
+import { api, withAuth } from "../utils/apiClients";
 import { useAuth } from "../context/AuthContext";
 import Sidebar from "../components/SideBar";
 import Navbar from "../components/NavBar";
@@ -75,7 +75,7 @@ const ProfilePage = () => {
             try {
 
                 // Utilizziamo l'endpoint di filtro per ottenere i post dell'utente
-                const response = await axios.get(`http://localhost:3000/api/posts/filter?author=${user.username}`);
+                const response = await api.get(`/api/posts?author=${user.username}`);
                 // Invia una richiesta GET all'endpoint di filtro, specificando l'username come autore
 
                 if (response.data) {
@@ -125,15 +125,7 @@ const ProfilePage = () => {
     const handleSaveProfile = async () => {
         try {
             const token = authCookies.getAuthToken();
-            const response = await axios.put(
-                'http://localhost:3000/api/users/profile',
-                profileData,
-                {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                }
-            );
+            const response = await api.put('/api/users/profile', profileData, withAuth(token));
             //Uso put e non post perché sto aggiornando un dato esistente
 
             // Aggiorna l'utente nel contesto

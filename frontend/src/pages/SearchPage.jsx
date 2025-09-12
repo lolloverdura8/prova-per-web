@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import { api } from "../utils/apiClients";
 import Sidebar from "../components/SideBar";
 import Navbar from "../components/NavBar";
 import Post from "../components/Post";
@@ -65,8 +65,7 @@ const SearchPage = () => {
         try {
             // Tenta di eseguire la richiesta di ricerca
 
-            const response = await axios.get(`http://localhost:3000/api/posts/search?query=${encodeURIComponent(searchQuery)}`); // econdedURIComponent serve per codificare correttamente la query poiché potrebbe contenere caratteri speciali
-            // Invia la richiesta GET all'API con la query codificata nell'URL
+            const response = await api.get(`/api/posts?search=${encodeURIComponent(searchQuery)}`);
 
             const posts = response.data;
             // Estrae i post dalla risposta
@@ -81,7 +80,7 @@ const SearchPage = () => {
                     try {
                         // Tenta di caricare i commenti completi per questo post
 
-                        const commentResponse = await axios.get(`http://localhost:3000/api/posts/${post._id}/comments`);
+                        const commentResponse = await api.get(`/api/posts/${post._id}/comments`);
                         // Richiede i commenti dettagliati per il post corrente
 
                         return {

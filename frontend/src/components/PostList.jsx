@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
-import axios from 'axios';
+import { api, withAuth } from '../utils/apiClients';
 
 import Post from "./Post";
 
@@ -50,7 +50,7 @@ const PostList = ({ refreshTrigger, savedMode }) => {
 
         try {
 
-            const response = await axios.get('http://localhost:3000/api/posts');
+            const response = await api.get('/api/posts');
             // Invia una richiesta GET all'endpoint dei post
 
             if (response.data) {
@@ -196,11 +196,7 @@ const PostList = ({ refreshTrigger, savedMode }) => {
                 try {
                     const token = authCookies.getAuthToken();
 
-                    const response = await axios.get('http://localhost:3000/api/posts/saved', {
-                        headers: {
-                            Authorization: `Bearer ${token}` // Includi il token nell'header di autorizzazione per evitare errori 401
-                        }
-                    });
+                    const response = await api.get('/api/posts/saved', withAuth(token));
                     // Invia una richiesta GET all'endpoint dei post salvati
 
                     if (response.data) {
@@ -279,7 +275,7 @@ const PostList = ({ refreshTrigger, savedMode }) => {
         if (!userFilter && !dateFilter && !tagFilter) {
             if (savedMode) {
                 // Lista completa dei post salvati
-                axios.get('http://localhost:3000/api/posts/saved', { headers })
+                api.get('/posts/saved', { headers })
                     .then(response => {
                         setFilteredPosts(response.data);
                         const authors = [...new Set(response.data.map(post => post.author?.username).filter(Boolean))]; //map estra in base a return della callback
@@ -307,7 +303,7 @@ const PostList = ({ refreshTrigger, savedMode }) => {
 
             } else {
                 // Lista completa di tutti i post
-                axios.get('http://localhost:3000/api/posts')
+                api.get('/api/posts')
                     .then(response => {
                         setFilteredPosts(response.data);
                         const authors = [...new Set(response.data.map(post => post.author?.username).filter(Boolean))];

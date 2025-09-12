@@ -16,7 +16,7 @@ import { useSocket } from "../context/SocketContext";
 import UserSettings from "./UserSettings";
 // Importa il componente per le impostazioni utente
 
-import "../styles/Sidebar.css";
+import "../styles/SideBar.css";
 // Importa gli stili CSS per la barra laterale
 
 

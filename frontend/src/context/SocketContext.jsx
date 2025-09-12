@@ -1,8 +1,9 @@
 import React, { createContext, useContext, useEffect, useRef, useState } from "react";
 import { io } from "socket.io-client";
 import { useAuth } from "./AuthContext";
-import axios from "axios";
+
 import { authCookies } from '../utils/cookieUtils';
+import { api } from "../utils/apiClients";
 
 const SocketContext = createContext(null); // Inizializza con null
 export const useSocket = () => useContext(SocketContext); // Hook personalizzato per usare il contesto
@@ -18,9 +19,7 @@ export const SocketProvider = ({ children }) => {
     const markAllNotificationsAsRead = async () => {
         try {
             const token = authCookies.getAuthToken(); // Ottieni il token da localStorage
-            await axios.post("http://localhost:3000/api/notifications/read-all", {}, {
-                headers: { Authorization: `Bearer ${token}` } // Includi il token nell'header di autorizzazione 
-            });
+            await api.post('/api/notifications/mark-all-read', {}, withAuth(token));
             setHasUnreadNotifications(false); // Aggiorna lo stato locale
         } catch (error) {
             console.error("Errore nel segnare le notifiche come lette:", error);
@@ -34,9 +33,7 @@ export const SocketProvider = ({ children }) => {
             if (user && user._id) {
                 try {
                     const token = authCookies.getAuthToken();
-                    const response = await axios.get("http://localhost:3000/api/notifications", {
-                        headers: { Authorization: `Bearer ${token}` }
-                    });
+                    const response = await withAuth(token).get("/api/notifications/unread");
                     const hasUnread = response.data.some(n => !n.isRead); // Controlla se c'è almeno una notifica non letta, setta hasUnread su true/false
                     setHasUnreadNotifications(hasUnread); // Aggiorna lo stato di hasUnreadNotifications
                 } catch (error) {

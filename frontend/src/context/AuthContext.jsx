@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect } from "react";
-import axios from 'axios';
 import { authCookies } from '../utils/cookieUtils';
+import { api, withAuth } from "../utils/apiClients";
 
 const AuthContext = createContext();
 
@@ -14,9 +14,8 @@ export const AuthProvider = ({ children }) => {
             setLoading(true);
 
             // Ottieni il token dal cookie o, se non presente, da localStorage
-            const tokenFromCookie = authCookies.getAuthToken();
-            const tokenFromStorage = localStorage.getItem('token');
-            const token = tokenFromCookie || tokenFromStorage;
+            const token = authCookies.getAuthToken();
+
 
             if (!token) {
                 setUser(null);
@@ -25,11 +24,7 @@ export const AuthProvider = ({ children }) => {
             }
 
             try {
-                const response = await axios.get("http://localhost:3000/api/users/profile", {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
+                const response = await api.get("/api/users/profile", withAuth(token));
 
                 setUser(response.data);
 
@@ -59,7 +54,7 @@ export const AuthProvider = ({ children }) => {
     // Funzione di login migliorata
     const login = async (credentials) => {
         try {
-            const response = await axios.post("http://localhost:3000/api/users/login", credentials);
+            const response = await api.post("/api/users/login", credentials);
             const { token, user } = response.data;
 
             // Salva il token sia nei cookie che nel localStorage per compatibilità
@@ -89,7 +84,7 @@ export const AuthProvider = ({ children }) => {
     // Funzione di registrazione
     const register = async (userData) => {
         try {
-            const response = await axios.post("http://localhost:3000/api/users/register", userData);
+            const response = await api.getost("/api/users/register", userData);
             return { success: true, message: response.data.message };
         } catch (error) {
             console.error("Errore di registrazione:", error);

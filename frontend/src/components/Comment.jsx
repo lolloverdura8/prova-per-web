@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import axios from 'axios';
 import '../styles/Comment.css';
 import { authCookies } from '../utils/cookieUtils';
+import { api, withAuth } from '../utils/apiClients';
 
 // Comments display component
 const Comments = ({ comments = [] }) => {
@@ -48,12 +48,10 @@ const AddComment = ({ postId, onCommentAdded }) => {
                 return;
             }
 
-            const response = await axios.post(
-                `http://localhost:3000/api/posts/${postId}/comments`,
+            const response = await api.post(
+                `/api/posts/${postId}/comments`,
                 { text },
-                {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                }
+                withAuth(token)
             );
 
             setText('');

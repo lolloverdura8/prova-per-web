@@ -121,10 +121,10 @@
 
 // export default CreatePost;
 import React, { useState } from "react";
-import axios from 'axios';
 import { FaExclamationCircle, FaPaperPlane } from "react-icons/fa";
 import { authCookies } from '../utils/cookieUtils';
 import '../styles/CreatePost.css';
+import { withAuth } from "../utils/apiClients";
 
 const CreatePost = ({ onPostCreated }) => {
     const [description, setDescription] = useState('');
@@ -155,7 +155,7 @@ const CreatePost = ({ onPostCreated }) => {
             .filter(tag => tag !== '');
 
         try {
-            // Ottieni il token dal cookie o, se non presente, da localStorage
+            // Ottieni il token di autenticazione dai cookie
             const token = authCookies.getAuthToken();
 
 
@@ -170,14 +170,11 @@ const CreatePost = ({ onPostCreated }) => {
                 tags: tagArray.length > 0 ? tagArray : undefined // Invia i tag solo se l'array non è vuoto 
             };
 
-            const response = await axios.post(
-                'http://localhost:3000/api/posts',
+            const response = await api.post(
+                '/api/posts',
                 postData,
-                {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                }
+                withAuth(token)
             );
-
             resetForm();
 
             if (onPostCreated) {

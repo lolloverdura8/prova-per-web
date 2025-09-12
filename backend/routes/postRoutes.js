@@ -17,7 +17,8 @@ router.get("/:id/comments", postController.getComments);
 router.get('/search', postController.searchPosts);
 router.get('/filter', postController.getFilteredPosts);
 router.get('/saved', auth, postController.getSavedPosts);
-router.post('/:id/Save', auth, postController.toggleSave);
+router.post('/:id/save', auth, postController.toggleSave);
+
 
 
 module.exports = router;

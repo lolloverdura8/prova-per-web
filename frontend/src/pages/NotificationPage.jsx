@@ -4,9 +4,10 @@ import { useAuth } from "../context/AuthContext";
 import Sidebar from "../components/SideBar";
 import Navbar from "../components/NavBar";
 import NotificationItem from "../components/Notificationitem";
-import axios from "axios";
+
 import "../styles/NotificationsPage.css";
 import { authCookies } from "../utils/cookieUtils";
+import { api, withAuth } from "../utils/apiClients";
 
 const NotificationsPage = () => {
     const { user } = useAuth();
@@ -33,9 +34,7 @@ const NotificationsPage = () => {
         if (!token) { return; }
 
         try {
-            const response = await axios.get("http://localhost:3000/api/notifications", {
-                headers: { Authorization: `Bearer ${token}` }
-            })
+            const response = await api.get('/api/notifications', withAuth(token));
 
             if (!Array.isArray(response.data)) {
                 setNotifications([]);

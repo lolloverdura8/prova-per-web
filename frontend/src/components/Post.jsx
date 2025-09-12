@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from 'axios';
+import { api, withAuth } from '../utils/apiClients';
 import { Comments, AddComment } from "./Comment";
 import { FaHeart, FaRegHeart, FaComment, FaBookmark } from "react-icons/fa";
 import '../styles/Post.css';
@@ -21,9 +21,7 @@ const Post = ({ post }) => {
             try {
                 const token = authCookies.getAuthToken(); // Ottieni il token da cookies
                 if (!token) return;
-                const userData = await axios.get('http://localhost:3000/api/users/profile', {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
+                const userData = await api.get('/api/users/profile', withAuth(token));
                 if (userData.data && userData.data._id) {
                     setIsSaved(saved.includes(userData.data._id)); // Controlla se l'ID dell'utente è nell'array saved e aggiorna lo stato
                 }
@@ -36,9 +34,7 @@ const Post = ({ post }) => {
                 const token = authCookies.getAuthToken(); // Ottieni il token da cookies
                 if (!token) return;
 
-                const userData = await axios.get('http://localhost:3000/api/users/profile', {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
+                const userData = await api.get('/api/users/profile', withAuth(token));
 
                 if (userData.data && userData.data._id) {
                     setIsLiked(likes.includes(userData.data._id)); // Controlla se l'ID dell'utente è nell'array likes e aggiorna lo stato
@@ -57,10 +53,10 @@ const Post = ({ post }) => {
             const token = authCookies.getAuthToken(); // Ottieni il token da cookies
             if (!token) return;
 
-            const response = await axios.post(
-                `http://localhost:3000/api/posts/${_id}/like`,
-                {},
-                { headers: { 'Authorization': `Bearer ${token}` } }
+            const response = await api.post(
+                `/api/posts/${_id}/like`,
+                {}, // Corpo della richiesta vuoto
+                withAuth(token)
             );
 
             if (response.data) {
@@ -88,10 +84,10 @@ const Post = ({ post }) => {
             const token = authCookies.getAuthToken();
             if (!token) return;
 
-            const response = await axios.post(
-                `http://localhost:3000/api/posts/${_id}/Save`,
+            const response = await api.post(
+                `/api/posts/${_id}/save`,
                 {}, // Corpo della richiesta vuoto
-                { headers: { 'Authorization': `Bearer ${token}` } }
+                withAuth(token)
             );
 
             if (response.data) {
