@@ -42,7 +42,7 @@ app.use(express.json());
 
 app.use(
     cors({
-        origin: "http://prova-per-web.vercel.app",
+        origin: "https://prova-per-web.vercel.app",
         // Specifica l'origine consentita (il frontend in sviluppo su Vite)
         credentials: true,
         // Permette l'invio di credenziali (cookie) nelle richieste cross-origin
