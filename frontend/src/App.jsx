@@ -10,6 +10,8 @@ import Saved from "./pages/Saved";
 import NotificationPage from "./pages/NotificationPage";
 import { getUserPreference, PREFERENCE_TYPES } from "./utils/preferenceUtils";
 import './App.css';
+import CookieBanner from "./components/CookieBanner";
+
 
 function App() {
     console.log("App montata!");
@@ -33,6 +35,7 @@ function App() {
                         <Route path="/saved" element={<Saved />} />
                         <Route path="/notifications" element={<NotificationPage />} />
                     </Routes>
+                    <CookieBanner />
                 </Router>
             </SocketProvider>
         </AuthProvider>
