@@ -14,7 +14,10 @@ export const AuthProvider = ({ children }) => {
             setLoading(true);
 
             // Ottieni il token dal cookie o, se non presente, da localStorage
-            const token = authCookies.getAuthToken();
+            const tokenFromCookie = authCookies.getAuthToken();
+            const tokenFromStorage = localStorage.getItem('token');
+            const token = tokenFromCookie || tokenFromStorage;
+
 
 
             if (!token) {
@@ -84,7 +87,7 @@ export const AuthProvider = ({ children }) => {
     // Funzione di registrazione
     const register = async (userData) => {
         try {
-            const response = await api.getost("/api/users/register", userData);
+            const response = await api.post("/api/users/register", userData);
             return { success: true, message: response.data.message };
         } catch (error) {
             console.error("Errore di registrazione:", error);
