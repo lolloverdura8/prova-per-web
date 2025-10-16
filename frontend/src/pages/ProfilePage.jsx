@@ -148,6 +148,19 @@ const ProfilePage = () => {
         }));
     };
 
+    const handleDeletePost = async (postId) => {
+
+        if (!window.confirm("Vuoi davvero eliminare questo post?")) return;
+
+        try {
+            await api.delete(`/api/posts/${postId}`);
+            setUserPosts(userPosts.filter(p => p._id !== postId)); // aggiorna lista
+        } catch (err) {
+            console.error("Errore durante l'eliminazione:", err);
+            alert("Errore: impossibile eliminare il post.");
+        }
+    };
+
     if (!user && authCookies.getAuthToken()) {
         // Se c'è un token ma l'utente non è ancora caricato (autenticazione in corso)
         return <div className="loading">Loading...</div>;
@@ -264,7 +277,7 @@ const ProfilePage = () => {
                                 {userPosts.map(post => (
                                     // Itera su ogni post
 
-                                    <Post key={post._id} post={post} />
+                                    <Post key={post._id} post={post} onDelete={handleDeletePost} />
                                     // Renderizza il componente Post per ogni post
                                 ))}
                             </div>

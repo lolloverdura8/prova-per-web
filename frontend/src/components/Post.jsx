@@ -5,8 +5,9 @@ import { FaHeart, FaRegHeart, FaComment, FaBookmark } from "react-icons/fa";
 import '../styles/Post.css';
 import { useSocket } from '../context/SocketContext';
 import { authCookies } from '../utils/cookieUtils';
+import { useAuth } from "../context/AuthContext";
 
-const Post = ({ post }) => {
+const Post = ({ post, onDelete }) => {
     const { _id, description, author, createdAt, comments, likes = [], tags = [], saved = [] } = post;
     const [postComments, setPostComments] = useState(comments || []);
     const [showComments, setShowComments] = useState(false);
@@ -14,6 +15,9 @@ const Post = ({ post }) => {
     const [isLiked, setIsLiked] = useState(false);
     const [isSaved, setIsSaved] = useState(false);
     const { socket } = useSocket();
+    const { user } = useAuth();
+    const isOwner = user && post.author?._id === user._id;
+    const isProfilePage = window.location.pathname.includes("/profile");
 
     // Controlla se l'utente ha già messo like o salvato il post
     useEffect(() => {
@@ -161,6 +165,15 @@ const Post = ({ post }) => {
                     <span>{isSaved ? "Salvato" : "Salva"}</span>
                     <FaBookmark className="action-icon" />
                 </button>
+                {isOwner && isProfilePage && (
+                    <button
+                        className="delete-btn"
+                        onClick={() => onDelete(post._id)}
+                        title="Elimina post"
+                    >
+                        <span className="button-text">Elimina</span>
+                    </button>
+                )}
             </div>
 
             {showComments && (
