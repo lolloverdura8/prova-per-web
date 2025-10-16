@@ -13,8 +13,11 @@ export const AuthProvider = ({ children }) => {
         const verifyAuth = async () => {
             setLoading(true);
 
+            const tokenFromCookie = authCookies.getAuthToken();
+            const tokenFromStorage = localStorage.getItem('token');
+
             // Ottieni il token dal cookie o, se non presente, da localStorage
-            const token = authCookies.getAuthToken();
+            const token = tokenFromCookie || tokenFromStorage;
 
 
             if (!token) {
