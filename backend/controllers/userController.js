@@ -1,6 +1,7 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/userModel");
+require("dotenv").config();
 
 module.exports = {
     register: async (req, res) => {
@@ -29,6 +30,7 @@ module.exports = {
             const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
                 expiresIn: "7d",
             });
+            res.cookie('token', token, { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'Lax', maxAge: 7 * 24 * 60 * 60 * 1000 });
             res.json({ token, user: userObj });
         } catch (err) {
             res.status(500).json({ error: err.message });
@@ -84,5 +86,11 @@ module.exports = {
         } catch (err) {
             res.status(500).json({ error: err.message });
         }
+    },
+
+    logout: (req, res) => {
+        res.clearCookie('token', { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'Lax' });
+        res.json({ message: 'Logout effettuato con successo' });
+        console.log("Logout effettuato con successo");
     }
 };

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import '../styles/Comment.css';
-import { authCookies } from '../utils/cookieUtils';
-import { api, withAuth } from '../utils/apiClients';
+// import { authCookies } from '../utils/cookieUtils';
+import { api, /*withAuth*/ } from '../utils/apiClients';
 
 // Comments display component
 const Comments = ({ comments = [] }) => {
@@ -42,16 +42,16 @@ const AddComment = ({ postId, onCommentAdded }) => {
         setError('');
 
         try {
-            const token = authCookies.getAuthToken();
-            if (!token) {
-                setError('You must be logged in to comment');
-                return;
-            }
+            // const token = authCookies.getAuthToken();
+            // if (!token) {
+            //     setError('You must be logged in to comment');
+            //     return;
+            // }
 
             const response = await api.post(
                 `/api/posts/${postId}/comments`,
-                { text },
-                withAuth(token)
+                { text }
+                // //withAuth(token)
             );
 
             setText('');

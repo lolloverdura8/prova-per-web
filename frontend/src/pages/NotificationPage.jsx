@@ -6,8 +6,8 @@ import Navbar from "../components/NavBar";
 import NotificationItem from "../components/Notificationitem";
 
 import "../styles/NotificationsPage.css";
-import { authCookies } from "../utils/cookieUtils";
-import { api, withAuth } from "../utils/apiClients";
+// import { authCookies } from "../utils/cookieUtils";
+import { api, /*withAuth*/ } from "../utils/apiClients";
 
 const NotificationsPage = () => {
     const { user } = useAuth();
@@ -18,10 +18,10 @@ const NotificationsPage = () => {
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        if (!user && !authCookies.getAuthToken()) {
+        if (!loading && !user /*&& !authCookies.getAuthToken()*/) {
             navigate('/');
         }
-    }, [user, navigate]);
+    }, [user, loading, navigate]);
     //redirect su login se non autenticato
 
     const fetchNotifications = async () => {
@@ -30,16 +30,16 @@ const NotificationsPage = () => {
         setLoading(true);
         setError(null); // Resetta l'errore prima di una nuova richiesta
 
-        const token = authCookies.getAuthToken();
-        if (!token) { return; }
+        // const token = authCookies.getAuthToken();
+        // if (!token) { return; }
 
         try {
-            const response = await api.get('/api/notifications', withAuth(token));
+            const response = await api.get('/api/notifications'/*,withAuth(token))*/);
 
             if (!Array.isArray(response.data)) {
                 setNotifications([]);
                 setError("Errore nel caricamento delle notifiche");
-                return;
+
             }
             setNotifications(response.data);
             setError(null);
@@ -79,7 +79,7 @@ const NotificationsPage = () => {
         return () => window.removeEventListener('notifications:refresh', onRefresh);
     }, [fetchNotifications]);
 
-    if (!user && authCookies.getAuthToken()) {
+    if (!user /*&& authCookies.getAuthToken()*/) {
         return <div className="loading">Loading...</div>;
     }
 

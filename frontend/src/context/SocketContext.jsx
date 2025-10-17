@@ -2,7 +2,7 @@ import React, { createContext, useContext, useEffect, useRef, useState } from "r
 import { io } from "socket.io-client";
 import { useAuth } from "./AuthContext";
 
-import { authCookies } from '../utils/cookieUtils';
+// import { authCookies } from '../utils/cookieUtils';
 import { api } from "../utils/apiClients";
 
 const SocketContext = createContext(null); // Inizializza con null
@@ -18,9 +18,11 @@ export const SocketProvider = ({ children }) => {
     // Segna tutte le notifiche come lette
     const markAllNotificationsAsRead = async () => {
         try {
-            const token = authCookies.getAuthToken(); // Ottieni il token da localStorage
-            await api.post('/api/notifications/mark-all-read', {}, withAuth(token));
-            setHasUnreadNotifications(false); // Aggiorna lo stato locale
+            // const token = authCookies.getAuthToken(); // Ottieni il token da localStorage
+            // await api.post('/api/notifications/mark-all-read', {}, //withAuth(token));
+            // setHasUnreadNotifications(false); // Aggiorna lo stato locale
+            await api.post('/api/notifications/read-all');
+            setHasUnreadNotifications(false);
         } catch (error) {
             console.error("Errore nel segnare le notifiche come lette:", error);
         }
@@ -32,10 +34,13 @@ export const SocketProvider = ({ children }) => {
         const checkUnreadNotifications = async () => {
             if (user && user._id) {
                 try {
-                    const token = authCookies.getAuthToken();
-                    const response = await withAuth(token).get("/api/notifications/unread");
-                    const hasUnread = response.data.some(n => !n.isRead); // Controlla se c'è almeno una notifica non letta, setta hasUnread su true/false
-                    setHasUnreadNotifications(hasUnread); // Aggiorna lo stato di hasUnreadNotifications
+                    // const token = authCookies.getAuthToken();
+                    // const response = await //withAuth(token).get("/api/notifications/unread");
+                    // const hasUnread = response.data.some(n => !n.isRead); // Controlla se c'è almeno una notifica non letta, setta hasUnread su true/false
+                    // setHasUnreadNotifications(hasUnread); // Aggiorna lo stato di hasUnreadNotifications
+                    const response = await api.get("/api/notifications");
+                    const hasUnread = response.data.some(n => !n.isRead);
+                    setHasUnreadNotifications(hasUnread);
                 } catch (error) {
                     console.error("Errore nel controllo notifiche non lette:", error);
                 }

@@ -15,4 +15,7 @@ router.get('/profile', auth, userController.getProfile);
 // Aggiorna profilo utente (richiede autenticazione)
 router.put('/profile', auth, userController.updateProfile);
 
+// Logout
+router.post('/logout', auth, userController.logout);
+
 module.exports = router;

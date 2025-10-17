@@ -1,11 +1,14 @@
 const jwt = require("jsonwebtoken");
 // Importa la libreria jsonwebtoken per la gestione dei token JWT
+require("dotenv").config();
+// Carica le variabili d'ambiente dal file .env nel process.env
 
 module.exports = (req, res, next) => {
     // Definisce un middleware di autenticazione che accetta req (richiesta), res (risposta) e next (funzione per passare al middleware successivo)
 
-    const token = req.header('Authorization')?.replace('Bearer ', '');
+    // const token = req.header('Authorization')?.replace('Bearer ', '');
     // Estrae l'header Authorization dalla richiesta e rimuove la parte "Bearer "
+    const token = req.cookies.token;
 
     if (!token) {
         // Se il token non esiste

@@ -7,22 +7,22 @@ import PostList from "../components/PostList";
 import FloatingActionButton from "../components/FloatingActionButton";
 import PostModal from "../components/PostModal";
 import "../styles/HomePage.css";
-import { authCookies } from "../utils/cookieUtils";
+// import { authCookies } from "../utils/cookieUtils";
 
 const Saved = () => {
-    const { user } = useAuth();
+    const { user, loading } = useAuth();
     const navigate = useNavigate();
     const [refreshPosts, setRefreshPosts] = useState(false);
     const [isPostModalOpen, setIsPostModalOpen] = useState(false);
 
     // Redirect se non autenticato
     useEffect(() => {
-        if (!user && !authCookies.getAuthToken()) {
+        if (!loading && !user /*&& !authCookies.getAuthToken()*/) {
             navigate('/');
         }
     }, [user, navigate]);
 
-    if (!user && authCookies.getAuthToken()) {
+    if (!user /*&& authCookies.getAuthToken()*/) {
         return <div className="loading">Loading...</div>;
         // Mostra un indicatore di caricamento se l'utente non è ancora caricato
     }

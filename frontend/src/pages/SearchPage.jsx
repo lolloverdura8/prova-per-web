@@ -6,7 +6,7 @@ import Navbar from "../components/NavBar";
 import Post from "../components/Post";
 import { FaSearch, FaTimes } from "react-icons/fa";
 import "../styles/SearchPage.css";
-import { authCookies } from "../utils/cookieUtils";
+// import { authCookies } from "../utils/cookieUtils";
 
 
 const SearchPage = () => {
@@ -30,18 +30,18 @@ const SearchPage = () => {
     // Inizializza la funzione di navigazione
 
     // Autenticare l'utente quando la pagina si carica
-    useEffect(() => {
-        // Effetto che si esegue quando il componente si monta
+    // useEffect(() => {
+    //     // Effetto che si esegue quando il componente si monta
 
-        const token = authCookies.getAuthToken();
+    //     const token = authCookies.getAuthToken();
 
-        if (!token) {
-            // Se non c'è un token (utente non autenticato)
+    //     if (!token) {
+    //         // Se non c'è un token (utente non autenticato)
 
-            navigate('/');
-            // Reindirizza alla pagina di login
-        }
-    }, [navigate]);
+    //         navigate('/');
+    //         // Reindirizza alla pagina di login
+    //     }
+    // }, [navigate]);
     // L'effetto si riattiva se la funzione navigate cambia
 
     const handleSearch = async (e) => {

@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { api, withAuth } from '../utils/apiClients';
+import { api, /*withAuth*/ } from '../utils/apiClients';
 import { Comments, AddComment } from "./Comment";
 import { FaHeart, FaRegHeart, FaComment, FaBookmark } from "react-icons/fa";
 import '../styles/Post.css';
 import { useSocket } from '../context/SocketContext';
-import { authCookies } from '../utils/cookieUtils';
+// import { authCookies } from '../utils/cookieUtils';
 import { useAuth } from "../context/AuthContext";
 
 const Post = ({ post, onDelete }) => {
@@ -23,9 +23,10 @@ const Post = ({ post, onDelete }) => {
     useEffect(() => {
         const checkIfSaved = async () => {
             try {
-                const token = authCookies.getAuthToken(); // Ottieni il token da cookies
-                if (!token) return;
-                const userData = await api.get('/api/users/profile', withAuth(token));
+                // const token = authCookies.getAuthToken(); // Ottieni il token da cookies
+                // if (!token) return;
+                const userData = await api.get('/api/users/profile'); //withAuth(token));
+
                 if (userData.data && userData.data._id) {
                     setIsSaved(saved.includes(userData.data._id)); // Controlla se l'ID dell'utente è nell'array saved e aggiorna lo stato
                 }
@@ -35,10 +36,10 @@ const Post = ({ post, onDelete }) => {
         };
         const checkIfLiked = async () => {
             try {
-                const token = authCookies.getAuthToken(); // Ottieni il token da cookies
-                if (!token) return;
+                // const token = authCookies.getAuthToken(); // Ottieni il token da cookies
+                // if (!token) return;
 
-                const userData = await api.get('/api/users/profile', withAuth(token));
+                const userData = await api.get('/api/users/profile'); //withAuth(token));
 
                 if (userData.data && userData.data._id) {
                     setIsLiked(likes.includes(userData.data._id)); // Controlla se l'ID dell'utente è nell'array likes e aggiorna lo stato
@@ -54,13 +55,13 @@ const Post = ({ post, onDelete }) => {
 
     const handleLike = async () => {
         try {
-            const token = authCookies.getAuthToken(); // Ottieni il token da cookies
-            if (!token) return;
+            // const token = authCookies.getAuthToken(); // Ottieni il token da cookies
+            // if (!token) return;
 
             const response = await api.post(
                 `/api/posts/${_id}/like`,
                 {}, // Corpo della richiesta vuoto
-                withAuth(token)
+                //withAuth(token)
             );
 
             if (response.data) {
@@ -85,13 +86,13 @@ const Post = ({ post, onDelete }) => {
 
     const handleSave = async () => {
         try {
-            const token = authCookies.getAuthToken();
-            if (!token) return;
+            // const token = authCookies.getAuthToken();
+            // if (!token) return;
 
             const response = await api.post(
                 `/api/posts/${_id}/save`,
                 {}, // Corpo della richiesta vuoto
-                withAuth(token)
+                //withAuth(token)
             );
 
             if (response.data) {

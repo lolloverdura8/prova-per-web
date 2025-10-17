@@ -5,6 +5,7 @@ const auth = require("../middleware/auth");
 
 // Importa le dipendenze necessarie per le rotte dei post
 // auth è un middleware per autenticare le richieste
+
 router.get('/saved/filter', auth, postController.getSavedPostsFiltered);
 router.post("/", auth, postController.createPost);
 router.get("/", postController.getPosts);

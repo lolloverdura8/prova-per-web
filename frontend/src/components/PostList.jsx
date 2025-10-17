@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
-import { api, withAuth } from '../utils/apiClients';
+import { api, /*withAuth*/ } from '../utils/apiClients';
 
 import Post from "./Post";
 
@@ -11,7 +11,7 @@ import Autocomplete from "./AutoComplete";
 import { FaTimes } from "react-icons/fa";
 
 import '../styles/PostList.css';
-import { authCookies } from "../utils/cookieUtils";
+// import { authCookies } from "../utils/cookieUtils";
 
 
 const PostList = ({ refreshTrigger, savedMode }) => {
@@ -194,9 +194,9 @@ const PostList = ({ refreshTrigger, savedMode }) => {
                 // Resetta eventuali errori precedenti
 
                 try {
-                    const token = authCookies.getAuthToken();
+                    // const token = authCookies.getAuthToken();
 
-                    const response = await api.get('/api/posts/saved', withAuth(token));
+                    const response = await api.get('/api/posts/saved') //withAuth(token));
                     // Invia una richiesta GET all'endpoint dei post salvati
 
                     if (response.data) {
@@ -260,22 +260,22 @@ const PostList = ({ refreshTrigger, savedMode }) => {
         if (tagFilter) params.append('tag', tagFilter); // Se c'è un filtro tag, aggiungilo ai parametri
 
         let url; // URL base per l'endpoint di filtro
-        let headers = {}; // Intestazioni della richiesta
+        // let headers = {}; // Intestazioni della richiesta
         if (savedMode) {
             // Siamo nella pagina "Salvati"
-            url = `http://localhost:3000/api/posts/saved/filter`;
-            const token = authCookies.getAuthToken(); // Ottieni il token dai cookie
-            if (token) headers['Authorization'] = `Bearer ${token}`;
+            url = `/api/posts/saved/filter`;
+            // const token = authCookies.getAuthToken(); // Ottieni il token dai cookie
+            // if (token) headers['Authorization'] = `Bearer ${token}`;
         } else {
             // Siamo in homepage
-            url = `http://localhost:3000/api/posts/filter`;
+            url = `/api/posts/filter`;
         }
 
         // Se NON ci sono filtri, carica la lista completa (come all'inizio)
         if (!userFilter && !dateFilter && !tagFilter) {
             if (savedMode) {
                 // Lista completa dei post salvati
-                api.get('/posts/saved', { headers })
+                api.get('/posts/saved')
                     .then(response => {
                         setFilteredPosts(response.data);
                         const authors = [...new Set(response.data.map(post => post.author?.username).filter(Boolean))]; //map estra in base a return della callback
@@ -323,7 +323,7 @@ const PostList = ({ refreshTrigger, savedMode }) => {
         // Se ci sono filtri, chiama il backend per i post filtrati
         if (params.toString()) url += `?${params.toString()}`;
 
-        axios.get(url, { headers })
+        api.get(url)
             .then(response => {
                 setFilteredPosts(response.data);
                 const authors = [...new Set(response.data.map(post => post.author?.username).filter(Boolean))];

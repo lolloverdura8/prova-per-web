@@ -6,8 +6,6 @@ const notificationController = require("../controllers/notificationController");
 // GET tutte le notifiche dell'utente
 router.get("/", auth, notificationController.getUserNotifications);
 
-// PUT una specifica notifica come letta
-
 
 router.post("/read-all", auth, notificationController.markAllNotificationsAsRead);
 

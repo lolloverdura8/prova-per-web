@@ -22,6 +22,7 @@ const http = require('http');
 const app = express();
 const server = http.createServer(app);
 const { Server } = require('socket.io');
+const cookieParser = require("cookie-parser");
 const io = new Server(server, { cors: { origin: '*' } });
 
 // Gestione stanze utente
@@ -39,6 +40,7 @@ app.set('io', io); // Per accedere a io nei controller
 
 app.use(express.json());
 // Middleware che analizza il corpo delle richieste con content-type application/json
+app.use(cookieParser());
 
 app.use(
     cors({

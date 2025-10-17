@@ -1,18 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { api, withAuth } from "../utils/apiClients";
+import { api, /*withAuth*/ } from "../utils/apiClients";
 import { useAuth } from "../context/AuthContext";
 import Sidebar from "../components/SideBar";
 import Navbar from "../components/NavBar";
 import Post from "../components/Post";
 import { FaEdit, FaCheck, FaTimes } from "react-icons/fa";
 import "../styles/ProfilePage.css";
-import { authCookies } from "../utils/cookieUtils";
+// import { authCookies } from "../utils/cookieUtils";
 
 
 const ProfilePage = () => {
 
-    const { user, setUser } = useAuth();
+    const { user, setUser, loading } = useAuth();
     // Estrae l'utente e la funzione per aggiornarlo dal contesto di autenticazione
 
     const navigate = useNavigate();
@@ -21,7 +21,7 @@ const ProfilePage = () => {
     const [userPosts, setUserPosts] = useState([]);
     // Stato per memorizzare i post dell'utente
 
-    const [loading, setLoading] = useState(true);
+    const [loadingPosts, setLoadingPosts] = useState(true);
     // Stato per gestire lo stato di caricamento
 
     const [error, setError] = useState('');
@@ -40,8 +40,8 @@ const ProfilePage = () => {
         // Effetto che si attiva al caricamento della pagina o quando user o navigate cambiano
 
         // redirect su login se non autenticato
-        if (!user && !authCookies.getAuthToken()) {
-            // Se non c'è un utente autenticato e non c'è un token nel localStorage
+        if (!loading && !user /*&& !authCookies.getAuthToken()*/) {
+
 
             navigate('/');
             // Reindirizza alla pagina di login
@@ -54,7 +54,7 @@ const ProfilePage = () => {
                 email: user.email || ''
             });
         }
-    }, [user, navigate]);
+    }, [user, loading, navigate]);
     // L'effetto si riattiva quando user o navigate cambiano
 
     useEffect(() => {
@@ -63,10 +63,7 @@ const ProfilePage = () => {
         const fetchUserPosts = async () => {
             // Funzione asincrona per recuperare i post dell'utente
 
-            if (!user) return;
-            // Se non c'è utente, esce dalla funzione
-
-            setLoading(true);
+            setLoadingPosts(true);
             // Imposta lo stato di caricamento
 
             setError('');
@@ -96,7 +93,7 @@ const ProfilePage = () => {
                 // Imposta un messaggio di errore per l'utente
             } finally {
 
-                setLoading(false);
+                setLoadingPosts(false);
                 // Termina lo stato di caricamento
             }
         };
@@ -124,8 +121,8 @@ const ProfilePage = () => {
     // Gestisce il salvataggio delle modifiche al profilo
     const handleSaveProfile = async () => {
         try {
-            const token = authCookies.getAuthToken();
-            const response = await api.put('/api/users/profile', profileData, withAuth(token));
+            // const token = authCookies.getAuthToken();
+            const response = await api.put('/api/users/profile', profileData); /*, withAuth(token)*/
             //Uso put e non post perché sto aggiornando un dato esistente
 
             // Aggiorna l'utente nel contesto
@@ -161,7 +158,7 @@ const ProfilePage = () => {
         }
     };
 
-    if (!user && authCookies.getAuthToken()) {
+    if (!user /*&& authCookies.getAuthToken()*/) {
         // Se c'è un token ma l'utente non è ancora caricato (autenticazione in corso)
         return <div className="loading">Loading...</div>;
         // Mostra un indicatore di caricamento
@@ -260,7 +257,7 @@ const ProfilePage = () => {
                         <h3>I tuoi post</h3>
                         {/* Titolo della sezione */}
 
-                        {loading ? (
+                        {loadingPosts ? (
                             // Se sta caricando
 
                             <div className="loading-container">Caricamento post...</div>

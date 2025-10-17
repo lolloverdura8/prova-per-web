@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect } from "react";
-import { authCookies } from '../utils/cookieUtils';
-import { api, withAuth } from "../utils/apiClients";
+// import { authCookies } from '../utils/cookieUtils';
+import { api, /*withAuth*/ } from "../utils/apiClients";
 
 const AuthContext = createContext();
 
@@ -11,39 +11,37 @@ export const AuthProvider = ({ children }) => {
     // Verifica l'autenticazione usando sia i cookie che localStorage
     useEffect(() => {
         const verifyAuth = async () => {
+
             setLoading(true);
 
-            const tokenFromCookie = authCookies.getAuthToken();
-            const tokenFromStorage = localStorage.getItem('token');
+            // const tokenFromCookie = authCookies.getAuthToken();
+            // const tokenFromStorage = localStorage.getItem('token');
 
-            // Ottieni il token dal cookie o, se non presente, da localStorage
-            const token = tokenFromCookie || tokenFromStorage;
+            // // Ottieni il token dal cookie o, se non presente, da localStorage
+            // const token = tokenFromCookie || tokenFromStorage;
 
 
-            if (!token) {
-                setUser(null);
-                setLoading(false);
-                return;
-            }
+            // if (!token) {
+            //     setUser(null);
+            //     setLoading(false);
+            //     return;
+            // }
 
             try {
-                const response = await api.get("/api/users/profile", withAuth(token));
-
+                const response = await api.get("/api/users/profile"); /*, withAuth(token)*/
                 setUser(response.data);
 
                 // Sincronizza il token tra cookie e localStorage se necessario
-                if (tokenFromCookie && !tokenFromStorage) {
-                    localStorage.setItem('token', tokenFromCookie);
-                } else if (!tokenFromCookie && tokenFromStorage) {
-                    authCookies.setAuthToken(tokenFromStorage);
-                }
+                // if (tokenFromCookie && !tokenFromStorage) {
+                //     localStorage.setItem('token', tokenFromCookie);
+                // } else if (!tokenFromCookie && tokenFromStorage) {
+                //     authCookies.setAuthToken(tokenFromStorage);
+                // }
             } catch (error) {
                 console.error("Errore di autenticazione:", error);
-
                 // In caso di errore, rimuovi il token da entrambi
-                authCookies.removeAuthToken();
-                localStorage.removeItem('token');
-
+                // authCookies.removeAuthToken();
+                // localStorage.removeItem('token');
                 setUser(null);
             } finally {
                 setLoading(false);
@@ -58,15 +56,15 @@ export const AuthProvider = ({ children }) => {
     const login = async (credentials) => {
         try {
             const response = await api.post("/api/users/login", credentials);
-            const { token, user } = response.data;
+            // const { token, user } = response.data;
 
-            // Salva il token sia nei cookie che nel localStorage per compatibilità
-            authCookies.setAuthToken(token);
-            localStorage.setItem('token', token);
+            // // Salva il token sia nei cookie che nel localStorage per compatibilità
+            // authCookies.setAuthToken(token);
+            // localStorage.setItem('token', token);
 
-            setUser(user);
+            setUser(response.data.user);
 
-            return { success: true, user };
+            return { success: true, user: response.data.user };
         } catch (error) {
             console.error("Errore di login:", error);
 
@@ -78,10 +76,16 @@ export const AuthProvider = ({ children }) => {
     };
 
     // Funzione di logout
-    const logout = () => {
-        authCookies.removeAuthToken();
-        localStorage.removeItem('token');
+    const logout = async () => {
+        try {
+            await api.post('/api/users/logout');/*, withAuth(token)*/
+        } catch (error) {
+            console.error("Errore di logout:", error);
+        }
+        // authCookies.removeAuthToken();
+        // localStorage.removeItem('token');
         setUser(null);
+
     };
 
     // Funzione di registrazione
@@ -112,4 +116,4 @@ export const AuthProvider = ({ children }) => {
     );
 };
 
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = () => useContext(AuthContext);   

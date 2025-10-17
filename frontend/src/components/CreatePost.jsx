@@ -122,9 +122,9 @@
 // export default CreatePost;
 import React, { useState } from "react";
 import { FaExclamationCircle, FaPaperPlane } from "react-icons/fa";
-import { authCookies } from '../utils/cookieUtils';
+// import { authCookies } from '../utils/cookieUtils';
 import '../styles/CreatePost.css';
-import { withAuth } from "../utils/apiClients";
+import { api } from "../utils/apiClients";
 
 const CreatePost = ({ onPostCreated }) => {
     const [description, setDescription] = useState('');
@@ -156,14 +156,14 @@ const CreatePost = ({ onPostCreated }) => {
 
         try {
             // Ottieni il token di autenticazione dai cookie
-            const token = authCookies.getAuthToken();
+            // const token = authCookies.getAuthToken();
 
 
-            if (!token) {
-                setError('Devi essere loggato per creare un post');
-                setLoading(false);
-                return;
-            }
+            // if (!token) {
+            //     setError('Devi essere loggato per creare un post');
+            //     setLoading(false);
+            //     return;
+            // }
 
             const postData = {
                 description,
@@ -173,7 +173,7 @@ const CreatePost = ({ onPostCreated }) => {
             const response = await api.post(
                 '/api/posts',
                 postData,
-                withAuth(token)
+                //withAuth(token)
             );
             resetForm();
 
