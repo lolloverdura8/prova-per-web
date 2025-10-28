@@ -23,10 +23,12 @@ module.exports = {
             if (!user || !(await bcrypt.compare(password, user.password))) {
                 return res.status(400).json({ message: "Credenziali errate" });
             }
-
+            console.log("Password verified for user:", user._id);
             // Rimuovi la password dall'oggetto utente
             const userObj = user.toObject();
             delete userObj.password;
+
+            console.log("Generating JWT token for user:", user._id);
 
             const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
                 expiresIn: "7d",
