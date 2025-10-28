@@ -65,10 +65,11 @@ const SearchPage = () => {
         try {
             // Tenta di eseguire la richiesta di ricerca
 
-            const response = await api.get(`/api/posts?search=${encodeURIComponent(searchQuery)}`);
+            const response = await api.get(`/api/posts/search?query=${encodeURIComponent(searchQuery)}`);
 
-            const posts = response.data;
+            const posts = response.data.data || [];
             // Estrae i post dalla risposta
+            console.log("Posts trovati:", posts);
 
             // Popolare i commenti con i dati dell'utente per ciascun post
             const populatedPosts = await Promise.all(posts.map(async (post) => {
