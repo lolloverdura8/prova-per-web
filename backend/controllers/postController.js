@@ -1,355 +1,238 @@
+// controllers/postController.js
 const Post = require("../models/postModel");
 const Notification = require("../models/notificationModel");
 
+// ----------------- Helpers comuni -----------------
+const parsePagination = (req, { defaultLimit = 10, maxLimit = 50 } = {}) => {
+    const page = Math.max(parseInt(req.query.page) || 1, 1);
+    const rawLimit = parseInt(req.query.limit) || defaultLimit;
+    const limit = Math.min(Math.max(rawLimit, 1), maxLimit);
+    const skip = (page - 1) * limit;
+    return { page, limit, skip };
+};
+
+const sendPaginated = (res, { data, page, limit, total }) => {
+    return res.json({
+        success: true,
+        data,
+        pagination: {
+            currentPage: page,
+            totalPages: Math.ceil(total / limit),
+            totalItems: total,
+            pageSize: limit,
+        },
+    });
+};
+
+// Popoliamo solo i campi necessari per snellire il payload
+const POST_POPULATE = [
+    { path: "author", select: "username avatar" },
+    { path: "comments.user", select: "username avatar" },
+];
+
+// ----------------- Controller -----------------
 module.exports = {
+    // Crea post
     createPost: async (req, res) => {
         try {
             const newPost = new Post({
-                ...req.body, // description, image, tags etc, spread operator per non doverli elencare tutti
-                author: req.user.id // From auth middleware
+                ...req.body,            // description, image, tags, ...
+                author: req.user.id,    // from auth middleware
             });
-            await newPost.save(); //save è un metodo asincrono che salva il post nel db
+            await newPost.save();
 
-            // Popola l'autore prima di inviare la risposta
-            const populatedPost = await Post.findById(newPost._id)
-                .populate('author', 'username');
-
-            res.status(201).json(populatedPost);
+            const populatedPost = await Post.findById(newPost._id).populate(POST_POPULATE);
+            return res.status(201).json({ success: true, data: populatedPost });
         } catch (err) {
-            res.status(500).json({ error: err.message });
+            return res.status(500).json({ success: false, error: err.message });
         }
     },
 
+    // Lista post (paginata)
     getPosts: async (req, res) => {
         try {
-            const posts = await Post.find()
-                .populate('author', 'username')
-                .populate('comments.user', 'username')
-                .sort({ createdAt: -1 });
-            res.json(posts);
+            const { page, limit, skip } = parsePagination(req);
+
+            const [posts, totalPosts] = await Promise.all([
+                Post.find()
+                    .populate(POST_POPULATE)
+                    .sort({ createdAt: -1 })
+                    .skip(skip)
+                    .limit(limit),
+                Post.countDocuments(),
+            ]);
+
+            return sendPaginated(res, { data: posts, page, limit, total: totalPosts });
         } catch (err) {
-            res.status(500).json({ error: err.message });
+            return res.status(500).json({ success: false, error: err.message });
         }
     },
 
+    // Aggiorna post (solo autore)
     updatePost: async (req, res) => {
         try {
             const post = await Post.findOneAndUpdate(
                 { _id: req.params.id, author: req.user.id },
                 req.body,
                 { new: true }
-            );
-            if (!post) return res.status(404).json({ message: "Post non trovato" });
-            res.json(post);
+            ).populate(POST_POPULATE);
+
+            if (!post) return res.status(404).json({ success: false, message: "Post non trovato" });
+            return res.json({ success: true, data: post });
         } catch (err) {
-            res.status(500).json({ error: err.message });
+            return res.status(500).json({ success: false, error: err.message });
         }
     },
 
+    // Elimina post (solo autore)
     deletePost: async (req, res) => {
         try {
-            const post = await Post.findOneAndDelete({
-                _id: req.params.id,
-                author: req.user.id
-            });
-            if (!post) return res.status(404).json({ message: "Post non trovato" });
-            res.json({ message: "Post eliminato" });
+            const post = await Post.findOneAndDelete({ _id: req.params.id, author: req.user.id });
+            if (!post) return res.status(404).json({ success: false, message: "Post non trovato" });
+            return res.json({ success: true, message: "Post eliminato" });
         } catch (err) {
-            res.status(500).json({ error: err.message });
+            return res.status(500).json({ success: false, error: err.message });
         }
     },
 
+    // Aggiungi commento
     addComment: async (req, res) => {
         try {
             const { text } = req.body;
-            if (!text) {
-                return res.status(400).json({ message: "Comment text is required" });
-            }
+            if (!text) return res.status(400).json({ success: false, message: "Comment text is required" });
 
             const post = await Post.findById(req.params.id);
-            if (!post) {
-                return res.status(404).json({ message: "Post not found" });
-            }
+            if (!post) return res.status(404).json({ success: false, message: "Post not found" });
 
-            post.comments.push({
-                user: req.user.id,
-                text
-            });
-
+            post.comments.push({ user: req.user.id, text });
             await post.save();
 
+            // Ottieni commento popolato
+            const populatedPost = await Post.findById(post._id).populate(POST_POPULATE);
+            const populatedComment = populatedPost.comments[populatedPost.comments.length - 1];
 
-            // Get the newly added comment with populated user
-            const newComment = post.comments[post.comments.length - 1];
-            const populatedPost = await Post.findById(post._id)
-                .populate('comments.user', 'username');
+            // Risposta HTTP
+            res.status(201).json({ success: true, data: populatedComment });
 
-            const populatedComment = populatedPost.comments.id(newComment._id);
-
-            res.status(201).json(populatedComment);
-
-            // CREA NOTIFICA SOLO SE NON SEI L'AUTORE
+            // Notifica (se non sei l'autore)
             if (post.author.toString() !== req.user.id.toString()) {
                 const preview = text.length > 50 ? text.substring(0, 50) + "..." : text;
-                const notifica = await Notification.create({
+                const notif = await Notification.create({
                     userId: post.author,
                     actorId: req.user.id,
                     postId: post._id,
-                    type: 'comment',
-                    preview
+                    type: "comment",
+                    preview,
                 });
 
-                // INVIA LA NOTIFICA REALTIME
-                if (req.io) {
-                    req.io.to(post.author.toString()).emit('new-notification', notifica);
-                }
+                if (req.io) req.io.to(post.author.toString()).emit("new-notification", notif);
             }
 
-            // Invia il commento appena aggiunto a tutti gli utenti che stanno visualizzando il post
-            req.io.to(post._id.toString()).emit('new-comment', newComment);
-            console.log("Inviata notifica realtime a", post.author.toString());
+            // Broadcast del commento (room del post)
+            if (req.io) req.io.to(post._id.toString()).emit("new-comment", populatedComment);
         } catch (err) {
-            res.status(500).json({ error: err.message });
+            return res.status(500).json({ success: false, error: err.message });
         }
-
-
-
     },
 
+    // Lista commenti (popolati)
     getComments: async (req, res) => {
         try {
-            const post = await Post.findById(req.params.id)
-                .populate('comments.user', 'username');
-
-            if (!post) {
-                return res.status(404).json({ message: "Post not found" });
-            }
-
-            res.json(post.comments);
+            const post = await Post.findById(req.params.id).populate({ path: "comments.user", select: "username avatar" });
+            if (!post) return res.status(404).json({ success: false, message: "Post not found" });
+            return res.json({ success: true, data: post.comments });
         } catch (err) {
-            res.status(500).json({ error: err.message });
+            return res.status(500).json({ success: false, error: err.message });
         }
     },
 
+    // Toggle like
     toggleLike: async (req, res) => {
         try {
             const post = await Post.findById(req.params.id);
-            if (!post) {
-                return res.status(404).json({ message: "Post not found" });
-            }
+            if (!post) return res.status(404).json({ success: false, message: "Post not found" });
 
-            const userId = req.user.id;
-            const likeIndex = post.likes.indexOf(userId);
+            const userId = req.user.id.toString();
+            const likeIndex = post.likes.findIndex((u) => u.toString() === userId);
 
-            // Toggle like
             let isLiked;
             if (likeIndex === -1) {
-                // Add like
-                post.likes.push(userId);
-                isLiked = true
-            }
-            else {
-                // Remove like
+                post.likes.push(req.user.id);
+                isLiked = true;
+            } else {
                 post.likes.splice(likeIndex, 1);
                 isLiked = false;
             }
 
             await post.save();
-            res.json({ likes: post.likes.length, isLiked });
+            res.json({ success: true, data: { likes: post.likes.length, isLiked } });
 
-            // CREA NOTIFICA SOLO SE NON SEI L'AUTORE
-            if (post.author.toString() !== userId.toString()) {
+            // Notifica like (solo se non è l'autore)
+            if (post.author.toString() !== userId) {
                 const exist = await Notification.findOne({
                     userId: post.author,
-                    actorId: userId,
+                    actorId: req.user.id,
                     postId: post._id,
-                    type: 'like'
+                    type: "like",
                 });
-                if (!exist) {
-                    await Notification.create({
-                        userId: post.author,
-                        actorId: userId,
-                        postId: post._id,
-                        type: 'like'
-                    });
 
-                    // Invia la notifica realtime all'utente destinatario
-                    req.io.to(post.author.toString()).emit('new-notification', {
+                if (!exist) {
+                    const notif = await Notification.create({
+                        userId: post.author,
                         actorId: req.user.id,
                         postId: post._id,
-                        type: 'like'
+                        type: "like",
                     });
-                    console.log("Inviata notifica realtime a", post.author.toString());
+                    if (req.io) req.io.to(post.author.toString()).emit("new-notification", notif);
                 }
             }
         } catch (err) {
             console.error("Errore in toggleLike:", err);
-            res.status(500).json({ message: "Errore interno" });
+            return res.status(500).json({ success: false, message: "Errore interno" });
         }
     },
 
-    // Ricerca post per contenuto
+    // Ricerca (paginata)
     searchPosts: async (req, res) => {
         try {
             const { query } = req.query;
+            if (!query) return res.status(400).json({ success: false, message: "Parametro di ricerca mancante" });
 
-            if (!query) {
-                return res.status(400).json({ message: "Parametro di ricerca mancante" });
-            }
+            const { page, limit, skip } = parsePagination(req);
+            const searchRegex = new RegExp(query, "i");
 
-            // Crea un'espressione regolare case-insensitive per la ricerca
-            const searchRegex = new RegExp(query, 'i');
+            const mongoQuery = {
+                $or: [{ description: { $regex: searchRegex } }, { tags: { $in: [searchRegex] } }],
+            };
 
-            // Cerca nei post per descrizione o tag che corrispondono alla query
-            const posts = await Post.find({
-                $or: [
-                    { description: { $regex: searchRegex } },
-                    { tags: { $in: [searchRegex] } }
-                ]
-            })
-                .populate('author', 'username avatar')
-                .populate('comments.user', 'username avatar')
-                .sort({ createdAt: -1 }); // Ordina per i più recenti prima
+            const [posts, total] = await Promise.all([
+                Post.find(mongoQuery)
+                    .populate(POST_POPULATE)
+                    .sort({ createdAt: -1 })
+                    .skip(skip)
+                    .limit(limit),
+                Post.countDocuments(mongoQuery),
+            ]);
 
-            res.json(posts);
+            return sendPaginated(res, { data: posts, page, limit, total });
         } catch (error) {
             console.error("Errore durante la ricerca:", error);
-            res.status(500).json({ message: "Errore del server durante la ricerca" });
+            return res.status(500).json({ success: false, message: "Errore del server durante la ricerca" });
         }
     },
 
-    // Versione corretta del controller
+    // Filtri (paginati)
     getFilteredPosts: async (req, res) => {
         try {
             const { author, date, tag } = req.query;
-
-            console.log("Parametri di filtro ricevuti:", { author, date, tag });
-
-            // Verifica che il modello Post sia importato correttamente
-            const Post = require("../models/postModel");
-
-            // Costruisci l'oggetto query in base ai filtri forniti
+            const { page, limit, skip } = parsePagination(req);
             const query = {};
 
             if (author) {
-                try {
-                    // Cerca l'utente per username
-                    const User = require("../models/userModel");
-                    const user = await User.findOne({ username: author });
-
-                    if (user) {
-                        query.author = user._id;
-                    } else {
-                        // Se l'utente non viene trovato, restituisci un array vuoto
-                        console.log(`Autore "${author}" non trovato`);
-                        return res.json([]);
-                    }
-                } catch (userError) {
-                    console.error("Errore nel cercare l'utente:", userError);
-                    // Non interrompere il flusso, continua con gli altri filtri
-                }
-            }
-
-            if (date) {
-                try {
-                    // Filtra per data (consideriamo l'intera giornata)
-                    const startDate = new Date(date);
-                    startDate.setHours(0, 0, 0, 0);
-
-                    const endDate = new Date(date);
-                    endDate.setHours(23, 59, 59, 999);
-
-                    query.createdAt = { $gte: startDate, $lte: endDate };
-                } catch (dateError) {
-                    console.error("Errore nel processare la data:", dateError);
-                    // Non interrompere il flusso, continua con gli altri filtri
-                }
-            }
-
-            if (tag) {
-                // Filtra per tag (esatta corrispondenza)
-                query.tags = tag;
-            }
-
-            console.log("Query MongoDB:", JSON.stringify(query));
-
-            // Esegui la query con gestione degli errori
-            let posts = [];
-            try {
-                posts = await Post.find(query)
-                    .populate('author', 'username')
-                    .populate('comments.user', 'username')
-                    .sort({ createdAt: -1 });
-
-                console.log(`Trovati ${posts.length} post`);
-            } catch (queryError) {
-                console.error("Errore nella query:", queryError);
-                return res.status(500).json({
-                    error: "Errore durante l'esecuzione della query",
-                    details: queryError.message
-                });
-            }
-
-            return res.json(posts);
-        } catch (err) {
-            console.error("Errore durante il filtraggio dei post:", err);
-            return res.status(500).json({
-                error: "Errore interno del server",
-                details: err.message
-            });
-        }
-    },
-
-    getSavedPosts: async (req, res) => {
-        try {
-            const userId = req.user.id; // Assuming user ID is available in req.user
-            const posts = await Post.find({ saved: userId })
-                .populate('author', 'username')
-                .populate('comments.user', 'username')
-                .sort({ createdAt: -1 });
-
-            res.json(posts);
-        } catch (err) {
-            res.status(500).json({ error: err.message });
-        }
-    },
-
-    toggleSave: async (req, res) => {
-        try {
-            const post = await Post.findById(req.params.id);
-            if (!post) return res.status(404).json({ message: 'Post not found' });
-
-            const userId = req.user.id;
-            const alreadySaved = post.saved.includes(userId);
-
-            if (alreadySaved) {
-                post.saved.pull(userId);
-            } else {
-                post.saved.push(userId);
-            }
-
-            await post.save();
-
-            res.json({
-                isSaved: !alreadySaved,
-                saved: post.saved
-            });
-        } catch (error) {
-            res.status(500).json({ message: 'Server error' });
-        }
-    },
-
-    getSavedPostsFiltered: async (req, res) => {
-        try {
-            const { author, date, tag } = req.query;
-            const userId = req.user.id;
-            const query = { saved: userId };
-
-            if (author) {
                 const User = require("../models/userModel");
-                const user = await User.findOne({ username: author });
-                if (user) query.author = user._id;
-                else return res.json([]); // Nessun post se autore non trovato
+                const user = await User.findOne({ username: author }).select("_id");
+                if (!user) return sendPaginated(res, { data: [], page, limit, total: 0 });
+                query.author = user._id;
             }
 
             if (date) {
@@ -360,20 +243,110 @@ module.exports = {
                 query.createdAt = { $gte: startDate, $lte: endDate };
             }
 
-            if (tag) {
-                query.tags = tag;
-            }
+            if (tag) query.tags = tag;
 
-            const posts = await Post.find(query)
-                .populate('author', 'username')
-                .populate('comments.user', 'username')
-                .sort({ createdAt: -1 });
+            const [posts, total] = await Promise.all([
+                Post.find(query)
+                    .populate(POST_POPULATE)
+                    .sort({ createdAt: -1 })
+                    .skip(skip)
+                    .limit(limit),
+                Post.countDocuments(query),
+            ]);
 
-            res.json(posts);
+            return sendPaginated(res, { data: posts, page, limit, total });
         } catch (err) {
-            res.status(500).json({ error: err.message });
+            console.error("Errore durante il filtraggio dei post:", err);
+            return res.status(500).json({ success: false, error: err.message });
         }
     },
 
+    // Post salvati (paginati)
+    getSavedPosts: async (req, res) => {
+        try {
+            const userId = req.user.id;
+            const { page, limit, skip } = parsePagination(req);
 
-}
+            const query = { saved: userId };
+            const [posts, total] = await Promise.all([
+                Post.find(query)
+                    .populate(POST_POPULATE)
+                    .sort({ createdAt: -1 })
+                    .skip(skip)
+                    .limit(limit),
+                Post.countDocuments(query),
+            ]);
+
+            return sendPaginated(res, { data: posts, page, limit, total });
+        } catch (err) {
+            return res.status(500).json({ success: false, error: err.message });
+        }
+    },
+
+    // Post salvati + filtri (paginati)
+    getSavedPostsFiltered: async (req, res) => {
+        try {
+            const { author, date, tag } = req.query;
+            const userId = req.user.id;
+            const { page, limit, skip } = parsePagination(req);
+
+            const query = { saved: userId };
+
+            if (author) {
+                const User = require("../models/userModel");
+                const user = await User.findOne({ username: author }).select("_id");
+                if (!user) return sendPaginated(res, { data: [], page, limit, total: 0 });
+                query.author = user._id;
+            }
+
+            if (date) {
+                const startDate = new Date(date);
+                startDate.setHours(0, 0, 0, 0);
+                const endDate = new Date(date);
+                endDate.setHours(23, 59, 59, 999);
+                query.createdAt = { $gte: startDate, $lte: endDate };
+            }
+
+            if (tag) query.tags = tag;
+
+            const [posts, total] = await Promise.all([
+                Post.find(query)
+                    .populate(POST_POPULATE)
+                    .sort({ createdAt: -1 })
+                    .skip(skip)
+                    .limit(limit),
+                Post.countDocuments(query),
+            ]);
+
+            return sendPaginated(res, { data: posts, page, limit, total });
+        } catch (err) {
+            return res.status(500).json({ success: false, error: err.message });
+        }
+    },
+
+    // Toggle salva
+    toggleSave: async (req, res) => {
+        try {
+            const post = await Post.findById(req.params.id);
+            if (!post) return res.status(404).json({ success: false, message: "Post not found" });
+
+            const userId = req.user.id.toString();
+            const alreadySaved = post.saved.some((u) => u.toString() === userId);
+
+            if (alreadySaved) post.saved.pull(req.user.id);
+            else post.saved.push(req.user.id);
+
+            await post.save();
+
+            return res.json({
+                success: true,
+                data: {
+                    isSaved: !alreadySaved,
+                    saved: post.saved, // array di userId
+                },
+            });
+        } catch (error) {
+            return res.status(500).json({ success: false, message: "Server error" });
+        }
+    },
+};

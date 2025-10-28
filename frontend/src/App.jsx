@@ -6,7 +6,7 @@ const HomePage = React.lazy(() => import("./pages/HomePage"));
 import LoginPage from "./pages/LoginPage";
 const SearchPage = React.lazy(() => import("./pages/SearchPage"));
 const ProfilePage = React.lazy(() => import("./pages/ProfilePage"));
-const Saved = React.lazy(() => import("./pages/SavedPage"));
+const Saved = React.lazy(() => import("./pages/Saved"));
 import NotificationPage from "./pages/NotificationPage";
 import { getUserPreference, PREFERENCE_TYPES } from "./utils/preferenceUtils";
 import './App.css';

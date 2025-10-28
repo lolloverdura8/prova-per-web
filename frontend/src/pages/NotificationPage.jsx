@@ -1,89 +1,113 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import Sidebar from "../components/SideBar";
 import Navbar from "../components/NavBar";
 import NotificationItem from "../components/Notificationitem";
-
 import "../styles/NotificationsPage.css";
-// import { authCookies } from "../utils/cookieUtils";
-import { api, /*withAuth*/ } from "../utils/apiClients";
+import { api } from "../utils/apiClients";
 
-const NotificationsPage = () => {
+const DEFAULT_LIMIT = 10;
+
+const NotificationPage = () => {
     const { user } = useAuth();
     const navigate = useNavigate();
 
     const [notifications, setNotifications] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
+    const [initializing, setInitializing] = useState(true);
     const [error, setError] = useState(null);
 
+    // pagination
+    const [page, setPage] = useState(1);
+    const [limit] = useState(DEFAULT_LIMIT);
+    const [hasMore, setHasMore] = useState(true);
+
+    const fetchingRef = useRef(false);
+    const sentinelRef = useRef(null);
+
+    // redirect if not logged
     useEffect(() => {
-        if (!loading && !user /*&& !authCookies.getAuthToken()*/) {
-            navigate('/');
-        }
-    }, [user, loading, navigate]);
-    //redirect su login se non autenticato
+        if (!initializing && !user) navigate("/");
+    }, [user, initializing, navigate]);
 
-    const fetchNotifications = async () => {
-        if (!user) return; // Se l'utente non è definito, esci dall'effetto
+    const resetList = useCallback(() => {
+        setNotifications([]);
+        setPage(1);
+        setHasMore(true);
+        setError(null);
+    }, []);
 
+    const fetchNotifications = useCallback(async () => {
+        if (!user) return;
+        if (fetchingRef.current || !hasMore) return;
+
+        fetchingRef.current = true;
         setLoading(true);
-        setError(null); // Resetta l'errore prima di una nuova richiesta
-
-        // const token = authCookies.getAuthToken();
-        // if (!token) { return; }
+        setError(null);
 
         try {
-            const response = await api.get('/api/notifications'/*,withAuth(token))*/);
+            const resp = await api.get(`/api/notifications?page=${page}&limit=${limit}`);
+            // backend shape atteso: { success, data, pagination }
+            const items = resp?.data?.data ?? [];
+            const pagination = resp?.data?.pagination;
 
-            if (!Array.isArray(response.data)) {
-                setNotifications([]);
-                setError("Errore nel caricamento delle notifiche");
+            setNotifications(prev => [...prev, ...items]);
 
+            if (pagination) {
+                setHasMore(pagination.currentPage < pagination.totalPages);
+            } else {
+                setHasMore(items.length === limit);
             }
-            setNotifications(response.data);
-            setError(null);
-        } catch (error) {
-            setNotifications([]);
+        } catch (err) {
+            console.error("Error fetching notifications:", err);
             setError("Errore nel caricamento delle notifiche");
         } finally {
             setLoading(false);
+            fetchingRef.current = false;
+            setInitializing(false);
         }
-    };
+    }, [user, page, limit, hasMore]);
 
-
+    // prima volta o cambio utente → reset e pagina 1
     useEffect(() => {
-        // .then(res => {
-        //     if (!Array.isArray(res.data)) { 
-        //         setNotifications([]);
-        //         setError("Errore nel caricamento delle notifiche");
-        //         return;
-        //     }
-        //     setNotifications(res.data);
-        //     setError(null);
-        // })
-        // .catch(err => {
-        //     setNotifications([]);
-        //     setError("Errore nel caricamento delle notifiche");
-        // })
-        // .finally(() => setLoading(false));
+        if (!user) return;
+        resetList();
+    }, [user, resetList]);
+
+    // ogni volta che cambia page → fetch
+    useEffect(() => {
+        if (!user) return;
         fetchNotifications();
-    }, [user]) // Effettua la richiesta quando l'utente cambia
+    }, [page, user, fetchNotifications]);
 
-
+    // evento custom per refresh (mantieni il tuo meccanismo)
     useEffect(() => {
         const onRefresh = () => {
-            fetchNotifications();
+            resetList();
+            setPage(1);
         };
-        window.addEventListener('notifications:refresh', onRefresh);
-        return () => window.removeEventListener('notifications:refresh', onRefresh);
-    }, [fetchNotifications]);
+        window.addEventListener("notifications:refresh", onRefresh);
+        return () => window.removeEventListener("notifications:refresh", onRefresh);
+    }, [resetList]);
 
-    if (!user /*&& authCookies.getAuthToken()*/) {
-        return <div className="loading">Loading...</div>;
-    }
+    // (opzionale) infinite scroll
+    useEffect(() => {
+        if (!sentinelRef.current) return;
+        const io = new IntersectionObserver(
+            entries => {
+                const first = entries[0];
+                if (first.isIntersecting && hasMore && !loading) {
+                    setPage(p => p + 1);
+                }
+            },
+            { rootMargin: "200px" }
+        );
+        io.observe(sentinelRef.current);
+        return () => io.disconnect();
+    }, [hasMore, loading]);
 
-    if (loading) return <div className="loading">Caricamento notifiche...</div>;
+    if (!user) return <div className="loading">Loading...</div>;
 
     return (
         <div className="home-container">
@@ -92,21 +116,33 @@ const NotificationsPage = () => {
                 <Navbar />
                 <div className="content-wrapper">
                     <h2>Notifiche</h2>
-                    {error && <div className="error-message">{error}</div>}
 
-                    {!error && notifications.length === 0 && (
+                    {error && <div className="error-message">{error}</div>}
+                    {!error && notifications.length === 0 && !loading && (
                         <p>Nessuna notifica</p>
                     )}
 
-                    {!error && notifications.length > 0 && (
-                        notifications.map(n => (
-                            <NotificationItem key={n._id} notification={n} />
-                        ))
+                    {notifications.map(n => (
+                        <NotificationItem key={n._id} notification={n} />
+                    ))}
+
+                    {loading && <div className="loading">Caricamento notifiche...</div>}
+
+                    {!loading && hasMore && (
+                        <button
+                            className="load-more-btn"
+                            onClick={() => setPage(p => p + 1)}
+                        >
+                            Carica altri
+                        </button>
                     )}
+
+                    {/* sentinel per infinite scroll */}
+                    <div ref={sentinelRef} />
                 </div>
             </div>
         </div>
     );
 };
 
-export default NotificationsPage;
+export default NotificationPage;
