@@ -18,13 +18,17 @@ const notificationsRoutes = require("./routes/notificationsRoutes");
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server, { cors: { origin: "*" } });
-
-
-FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173";
-
 
 // ================= SOCKET.IO =================
+const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173";
+
+const io = new Server(server, {
+    cors: {
+        origin: FRONTEND_URL,
+        credentials: true
+    }
+});
+
 io.on("connection", (socket) => {
     socket.on("join", (userId) => {
         socket.join(userId);
@@ -42,6 +46,9 @@ app.use(helmet());
 app.use(xss());
 app.use(mongoSanitize());
 
+app.set("trust proxy", 1);
+
+
 app.use(
     cors({
         origin: FRONTEND_URL,
@@ -51,26 +58,28 @@ app.use(
     })
 );
 
-app.set("trust proxy", 1); // Se dietro un proxy (es. Heroku, Nginx)
-
 // ================= CSRF PROTECTION =================
-const { generateToken, doubleCsrfProtection } = doubleCsrf({
+const {
+    generateToken,
+    doubleCsrfProtection,
+} = doubleCsrf({
     getSecret: () => process.env.CSRF_SECRET || "supersecretkey123",
     cookieName: "x-csrf-token",
     cookieOptions: {
         httpOnly: true,
-        sameSite: "lax",
-        secure: process.env.NODE_ENV === "production",
+        sameSite: "none",   // richiesto per domini diversi
+        secure: true        // richiesto per HTTPS (Render)
     },
 });
 
-// Middleware globale per protezione CSRF
+// Middleware globale CSRF
 app.use(doubleCsrfProtection);
 
-// Endpoint per fornire il token CSRF al frontend
+// ✅ Endpoint per fornire il token CSRF al frontend
 app.get("/api/csrf-token", (req, res) => {
+    // ordine corretto: (res, req)
     const csrfToken = generateToken(res, req);
-    res.json({ csrfToken });
+    res.status(200).json({ csrfToken });
 });
 
 // ================= ROTTE =================
