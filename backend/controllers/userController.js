@@ -19,6 +19,7 @@ module.exports = {
         const { email, password } = req.body;
         try {
             const user = await User.findOne({ email });
+            console.log("User found for login:", user);
             if (!user || !(await bcrypt.compare(password, user.password))) {
                 return res.status(400).json({ message: "Credenziali errate" });
             }
@@ -30,8 +31,11 @@ module.exports = {
             const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
                 expiresIn: "7d",
             });
+            console.log("Login successful, token generated");
             res.cookie('token', token, { httpOnly: true, secure: true, sameSite: 'none', maxAge: 7 * 24 * 60 * 60 * 1000 });
+            console.log("Cookie set for token");
             res.json({ token, user: userObj });
+            console.log("Login response sent");
         } catch (err) {
             res.status(500).json({ error: err.message });
         }
