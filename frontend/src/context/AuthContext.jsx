@@ -94,7 +94,7 @@ export const AuthProvider = ({ children }) => {
     // Funzione di registrazione
     const register = async (userData) => {
         try {
-            const response = await api.getost("/api/users/register", userData);
+            const response = await api.get("/api/users/register", userData);
             return { success: true, message: response.data.message };
         } catch (error) {
             console.error("Errore di registrazione:", error);

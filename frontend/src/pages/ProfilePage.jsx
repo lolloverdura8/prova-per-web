@@ -72,12 +72,12 @@ const ProfilePage = () => {
             try {
 
                 // Utilizziamo l'endpoint di filtro per ottenere i post dell'utente
-                const response = await api.get(`/api/posts?author=${user.username}`);
+                const res = await api.get(`/api/posts?author=${user.username}`);
                 // Invia una richiesta GET all'endpoint di filtro, specificando l'username come autore
+                const response = res.data.data
+                if (response) {
 
-                if (response.data) {
-
-                    setUserPosts(response.data);
+                    setUserPosts(response);
                     // Aggiorna lo stato con i post dell'utente
                 } else {
 
