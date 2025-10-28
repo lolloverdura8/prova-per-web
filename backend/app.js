@@ -62,24 +62,40 @@ app.use(
 const {
     generateToken,
     doubleCsrfProtection,
+    invalidCsrfTokenError,
 } = doubleCsrf({
     getSecret: () => process.env.CSRF_SECRET || "supersecretkey123",
     cookieName: "x-csrf-token",
     cookieOptions: {
         httpOnly: true,
-        sameSite: "none",   // richiesto per domini diversi
-        secure: true        // richiesto per HTTPS (Render)
+        sameSite: "none",   // domini diversi (Render <-> Vercel)
+        secure: true        // obbligatorio con SameSite=None
     },
+    // opzionale ma utile: header standardizzato
+    getTokenFromRequest: (req) => req.headers["x-csrf-token"],
 });
 
+
 // Middleware globale CSRF
+app.get("/api/csrf-token", (req, res) => {
+    try {
+        const csrfToken = generateToken(req, res);
+        return res.status(200).json({ csrfToken });
+    } catch (err) {
+        console.error("Errore generazione CSRF:", err);
+        return res.status(500).json({ error: "Errore generazione CSRF token" });
+    }
+});
+
+// Attiva la protezione per le rotte successive
 app.use(doubleCsrfProtection);
 
-// ✅ Endpoint per fornire il token CSRF al frontend
-app.get("/api/csrf-token", (req, res) => {
-    // ordine corretto: (res, req)
-    const csrfToken = generateToken(res, req);
-    res.status(200).json({ csrfToken });
+// (opzionale) handler pulito per errore CSRF
+app.use((err, req, res, next) => {
+    if (err === invalidCsrfTokenError) {
+        return res.status(403).json({ error: "Invalid CSRF token" });
+    }
+    return next(err);
 });
 
 // ================= ROTTE =================

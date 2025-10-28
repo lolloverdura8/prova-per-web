@@ -8,7 +8,7 @@ export const api = axios.create({
 export const initCSRF = async () => {
     try {
         const res = await api.get("/api/csrf-token");
-        api.defaults.headers.common["X-CSRF-Token"] = res.data.csrfToken;
+        api.defaults.headers["X-CSRF-Token"] = res.data?.csrfToken;
         console.log("CSRF token initialized", res.data.csrfToken);
     }
     catch (error) {
