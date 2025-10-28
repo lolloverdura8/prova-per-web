@@ -14,7 +14,7 @@ export const SocketProvider = ({ children }) => {
     const user = auth ? auth.user : null;
     const socketRef = useRef(null); // Crea un ref per memorizzare l'istanza socket (socketRef.current), così da poterla leggere/modificare senza provocare rerender.
     const [hasUnreadNotifications, setHasUnreadNotifications] = useState(false); // Stato per notifiche non lette
-
+    const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || "http://localhost:3000";
     // Segna tutte le notifiche come lette
     const markAllNotificationsAsRead = async () => {
         try {
@@ -57,7 +57,10 @@ export const SocketProvider = ({ children }) => {
         console.log("useEffect SocketProvider, user:", user);
         // Effetto che si attiva quando cambia l'utente (login/logout), per gestire la connessione socket
         if (user && user._id) {
-            socketRef.current = io("http://localhost:3000"); // Connetti al server Socket.IO
+            socketRef.current = io(SOCKET_URL, {
+                withCredentials: true,
+                transports: ['websocket'], // Forza l'uso di WebSocket
+            }); // Connetti al server Socket.IO
             socketRef.current.on("connect", () => { // Evento di connessione riuscita
                 console.log("Socket connesso!", socketRef.current.id);
                 socketRef.current.emit("join", user._id); // Unisciti a una stanza specifica per l'utente

@@ -20,6 +20,10 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, { cors: { origin: "*" } });
 
+
+FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173";
+
+
 // ================= SOCKET.IO =================
 io.on("connection", (socket) => {
     socket.on("join", (userId) => {
@@ -40,12 +44,14 @@ app.use(mongoSanitize());
 
 app.use(
     cors({
-        origin: "http://localhost:5173",
+        origin: FRONTEND_URL,
         credentials: true,
         methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
         allowedHeaders: ["Content-Type", "Authorization", "X-CSRF-Token"],
     })
 );
+
+app.set("trust proxy", 1); // Se dietro un proxy (es. Heroku, Nginx)
 
 // ================= CSRF PROTECTION =================
 const { generateToken, doubleCsrfProtection } = doubleCsrf({
