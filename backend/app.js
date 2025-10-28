@@ -86,9 +86,6 @@ server.listen(PORT, '0.0.0.0', () => {
     // Stampa l'errore se si verifica
 });
 
-if (require.main === module) {
-    server.listen(3000, () => console.log('Server avviato su porta 3000'));
-}
 // Esporta sia app che io
 module.exports = { app, io };
 

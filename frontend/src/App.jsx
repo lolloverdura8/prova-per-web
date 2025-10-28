@@ -1,12 +1,12 @@
-import React, { useEffect } from "react";
+import React, { useEffect, lazy, Suspense } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import { SocketProvider } from "./context/SocketContext";
-import Home from "./pages/HomePage";
+const HomePage = React.lazy(() => import("./pages/HomePage"));
 import LoginPage from "./pages/LoginPage";
-import SearchPage from "./pages/SearchPage";
-import ProfilePage from "./pages/ProfilePage";
-import Saved from "./pages/Saved";
+const SearchPage = React.lazy(() => import("./pages/SearchPage"));
+const ProfilePage = React.lazy(() => import("./pages/ProfilePage"));
+const Saved = React.lazy(() => import("./pages/SavedPage"));
 import NotificationPage from "./pages/NotificationPage";
 import { getUserPreference, PREFERENCE_TYPES } from "./utils/preferenceUtils";
 import './App.css';
@@ -26,17 +26,19 @@ function App() {
     return (
         <AuthProvider>
             <SocketProvider>
-                <Router>
-                    <Routes>
-                        <Route path="/" element={<LoginPage />} />
-                        <Route path="/home" element={<Home />} />
-                        <Route path="/search" element={<SearchPage />} />
-                        <Route path="/profile" element={<ProfilePage />} />
-                        <Route path="/saved" element={<Saved />} />
-                        <Route path="/notifications" element={<NotificationPage />} />
-                    </Routes>
-                    <CookieBanner />
-                </Router>
+                <Suspense>
+                    <Router>
+                        <Routes>
+                            <Route path="/" element={<LoginPage />} />
+                            <Route path="/home" element={<HomePage />} />
+                            <Route path="/search" element={<SearchPage />} />
+                            <Route path="/profile" element={<ProfilePage />} />
+                            <Route path="/saved" element={<Saved />} />
+                            <Route path="/notifications" element={<NotificationPage />} />
+                        </Routes>
+                        <CookieBanner />
+                    </Router>
+                </Suspense>
             </SocketProvider>
         </AuthProvider>
     );
