@@ -7,7 +7,16 @@ const auth = require('../middleware/auth');
 router.post('/register', userController.register);
 
 // Login
-router.post('/login', userController.login);
+router.post('/login', async (req, res, next) => {
+    try {
+        console.log("Login attempt:", req.body);
+        await userController.login(req, res);
+    } catch (error) {
+        console.error("Login error:", error);
+        res.status(500).json({ error: "Internal server error during login", details: error.message });
+    }
+}
+);
 
 // Ottieni profilo utente (richiede autenticazione)
 router.get('/profile', auth, userController.getProfile);
