@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect } from "react";
 // import { authCookies } from '../utils/cookieUtils';
-import { api, /*withAuth*/ } from "../utils/apiClients";
+import { api, initCSRF, /*withAuth*/ } from "../utils/apiClients";
 
 const AuthContext = createContext();
 
@@ -13,6 +13,7 @@ export const AuthProvider = ({ children }) => {
         const verifyAuth = async () => {
 
             setLoading(true);
+
 
             // const tokenFromCookie = authCookies.getAuthToken();
             // const tokenFromStorage = localStorage.getItem('token');
@@ -28,6 +29,7 @@ export const AuthProvider = ({ children }) => {
             // }
 
             try {
+                await initCSRF(); // Inizializza il token CSRF
                 const response = await api.get("/api/users/profile"); /*, withAuth(token)*/
                 setUser(response.data);
 
@@ -79,6 +81,7 @@ export const AuthProvider = ({ children }) => {
     const logout = async () => {
         try {
             await api.post('/api/users/logout');/*, withAuth(token)*/
+            await initCSRF(); // Re-inizializza il token CSRF dopo il logout
         } catch (error) {
             console.error("Errore di logout:", error);
         }

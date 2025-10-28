@@ -39,7 +39,10 @@ export const SocketProvider = ({ children }) => {
                     // const hasUnread = response.data.some(n => !n.isRead); // Controlla se c'è almeno una notifica non letta, setta hasUnread su true/false
                     // setHasUnreadNotifications(hasUnread); // Aggiorna lo stato di hasUnreadNotifications
                     const response = await api.get("/api/notifications");
-                    const hasUnread = response.data.some(n => !n.isRead);
+                    const notifications = Array.isArray(response.data)
+                        ? response.data // nel raro caso in cui il backend restituisca direttamente un array
+                        : response.data.data || []; // in tutti gli altri casi
+                    const hasUnread = notifications.some(n => !n.isRead);
                     setHasUnreadNotifications(hasUnread);
                 } catch (error) {
                     console.error("Errore nel controllo notifiche non lette:", error);

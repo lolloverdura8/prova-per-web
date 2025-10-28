@@ -55,24 +55,28 @@ const Post = ({ post, onDelete }) => {
 
     const handleLike = async () => {
         try {
-            // const token = authCookies.getAuthToken(); // Ottieni il token da cookies
-            // if (!token) return;
+            // Aggiorna subito lo stato locale per feedback immediato
+            setIsLiked(prev => !prev);
+            setLikesCount(prev => (isLiked ? prev - 1 : prev + 1));
 
-            const response = await api.post(
-                `/api/posts/${_id}/like`,
-                {}, // Corpo della richiesta vuoto
-                //withAuth(token)
-            );
+            const response = await api.post(`/api/posts/${_id}/like`);
 
-            if (response.data) {
-                setLikesCount(response.data.likes); // Aggiorna il conteggio dei like
-                setIsLiked(response.data.isLiked); // Aggiorna lo stato isLiked 
-                post.likes = response.data.likes; // aggiorna il campo likes
+            // Se il backend ritorna il conteggio aggiornato, aggiorna i valori con quelli "ufficiali"
+            if (response.data?.likes !== undefined) {
+                setLikesCount(response.data.likes);
             }
+            if (response.data?.isLiked !== undefined) {
+                setIsLiked(response.data.isLiked);
+            }
+
         } catch (error) {
-            console.error('Error liking post:', error);
+            console.error("Error liking post:", error);
+            // In caso di errore, rollback dello stato locale
+            setIsLiked(prev => !prev);
+            setLikesCount(prev => (isLiked ? prev + 1 : prev - 1));
         }
     };
+
 
     const handleCommentAdded = (newComment) => {
         setPostComments([...postComments, newComment]); // Aggiungi il nuovo commento alla lista dei commenti lasciando invariata la precedente tramite lo spread operator "..."
@@ -86,23 +90,20 @@ const Post = ({ post, onDelete }) => {
 
     const handleSave = async () => {
         try {
-            // const token = authCookies.getAuthToken();
-            // if (!token) return;
+            setIsSaved(prev => !prev); // feedback immediato
 
-            const response = await api.post(
-                `/api/posts/${_id}/save`,
-                {}, // Corpo della richiesta vuoto
-                //withAuth(token)
-            );
+            const response = await api.post(`/api/posts/${_id}/save`);
 
-            if (response.data) {
+            if (response.data?.isSaved !== undefined) {
                 setIsSaved(response.data.isSaved);
-                post.saved = response.data.saved; // aggiorna il campo saved
             }
+
         } catch (error) {
-            console.error('Error saving post:', error);
+            console.error("Error saving post:", error);
+            setIsSaved(prev => !prev); // rollback in caso di errore
         }
     };
+
 
 
     // Gestione dei commenti in tempo reale tramite socket

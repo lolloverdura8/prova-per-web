@@ -70,14 +70,16 @@ const PostList = ({ refreshTrigger, savedMode }) => {
         }
     };
 
-    const resetList = () => {
+    const resetList = async () => {
         setFilteredPosts([]);
         setUniqueAuthors([]);
         setUniqueTags([]);
         setPage(1);
         setHasMore(true);
         setError("");
+        await fetchPage();
     };
+
 
     // ------- Fetchers -------
     const fetchPage = async () => {
@@ -205,7 +207,7 @@ const PostList = ({ refreshTrigger, savedMode }) => {
 
             <div className="post-list">
                 {filteredPosts.map((post) => (
-                    <Post key={post._id} post={post} />
+                    <Post key={post._id} post={post} onDelete={(id) => setFilteredPosts(prev => prev.filter(p => p._id !== id))} />
                 ))}
 
                 {loading && <div className="loading-container">Caricamento post...</div>}

@@ -1,5 +1,6 @@
 import React from "react";
 import "../styles/NotificationItem.css"; // Importo gli stili per il componente
+import { Card, CardContent, Typography } from "@mui/material";
 // Componente per mostrare una singola notifica
 const NotificationItem = ({ notification }) => {
     // Estraggo i dati dalla notifica ricevuta come props
@@ -25,10 +26,11 @@ const NotificationItem = ({ notification }) => {
     };
 
     return (
-        <div className="notification-item">
-            {/* Mostro il messaggio costruito */}
-            {renderMessage()}
-        </div>
+        <Card className="notification-item" sx={{ mb: 2 }}>
+            <CardContent>
+                <Typography variant="body1">{renderMessage()}</Typography>
+            </CardContent>
+        </Card>
     );
 };
 
