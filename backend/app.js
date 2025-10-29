@@ -32,7 +32,7 @@ const io = new Server(server, {
 io.on("connection", (socket) => {
     socket.on("join", (userId) => {
         socket.join(userId);
-        console.log("Socket", socket.id, "join stanza", userId);
+        console.log("Socket join stanza");
     });
     socket.on("connect", () => console.log("Socket connesso!"));
 });
@@ -111,14 +111,14 @@ app.use("/api/notifications", notificationsRoutes);
 // ================= DATABASE =================
 mongoose
     .connect(process.env.MONGODB_URI)
-    .then(() => console.log("✅ Connected to MongoDB"))
-    .catch((err) => console.error("❌ MongoDB connection error:", err));
+    .then(() => console.log("Connected to MongoDB"))
+    .catch((err) => console.error("MongoDB connection error:", err));
 
 // ================= SERVER =================
 const PORT = process.env.PORT || 3000;
 server
     .listen(PORT, "0.0.0.0", () => {
-        console.log(`🚀 Server in ascolto su porta ${PORT}`);
+        console.log(`Server in ascolto su porta ${PORT}`);
     })
     .on("error", (err) => {
         console.error("Errore durante l'avvio del server:", err);
