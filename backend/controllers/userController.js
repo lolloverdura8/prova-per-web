@@ -2,14 +2,38 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/userModel");
 require("dotenv").config();
+const crypto = require("crypto");
+const nodemailer = require("nodemailer");
 
 module.exports = {
     register: async (req, res) => {
         const { username, email, password } = req.body;
         try {
+            const existingUser = await User.findOne({ email });
+            if (existingUser) {
+                return res.status(400).json({ message: "Email già in uso" });
+            }
+            const verificationToken = crypto.randomBytes(32).toString('hex');
             const newUser = new User({ username, email, password });
             await newUser.save();
-            res.status(201).json({ message: "Utente registrato" });
+            const transporter = nodemailer.createTransport({
+                service: 'Gmail',
+                auth: {
+                    user: process.env.EMAIL_USER,
+                    pass: process.env.EMAIL_PASS,
+                },
+            });
+            const verificationLink = `${process.env.FRONTEND_URL}/verify-email?token=${verificationToken}`;
+
+            await transporter.sendMail({
+                from: process.env.EMAIL_USER,
+                to: email,
+                subject: 'Verifica la tua email',
+                html: `<p>Clicca sul link per verificare la tua email: <a href="${verificationLink}">${verificationLink}</a></p>`,
+            });
+            res.status(201).json({
+                message: "Registrazione avvenuta! Controlla la tua email per verificare l'account."
+            });
         } catch (err) {
             res.status(500).json({ error: err.message });
         }
@@ -22,7 +46,10 @@ module.exports = {
             console.log("User found for login:", user);
             if (!user || !(await bcrypt.compare(password, user.password))) {
                 return res.status(400).json({ message: "Credenziali errate" });
+            } else if (!user.isVerified) {
+                return res.status(400).json({ message: "Account non verificato. Controlla la tua email." });
             }
+
             console.log("Password verified for user:", user._id);
             // Rimuovi la password dall'oggetto utente
             const userObj = user.toObject();

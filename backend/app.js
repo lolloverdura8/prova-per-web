@@ -1,5 +1,5 @@
 require("dotenv").config();
-
+const verifyRoutes = require("./routes/verifyRoutes");
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
@@ -99,6 +99,7 @@ app.use((err, req, res, next) => {
 });
 
 // ================= ROTTE =================
+app.use("/api/auth", require("./routes/verifyRoutes"));
 app.use("/api/users", userRoutes);
 
 app.use("/api/posts", (req, res, next) => {

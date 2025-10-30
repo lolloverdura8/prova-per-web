@@ -11,7 +11,7 @@ import NotificationPage from "./pages/NotificationPage";
 import { getUserPreference, PREFERENCE_TYPES } from "./utils/preferenceUtils";
 import './App.css';
 import CookieBanner from "./components/CookieBanner";
-
+import VerifyEmail from "./pages/VerifyEmail";
 
 function App() {
     console.log("App montata!");
@@ -30,6 +30,7 @@ function App() {
                     <Router>
                         <Routes>
                             <Route path="/" element={<LoginPage />} />
+                            <Route path="/verify-email" element={<VerifyEmail />} />
                             <Route path="/home" element={<HomePage />} />
                             <Route path="/search" element={<SearchPage />} />
                             <Route path="/profile" element={<ProfilePage />} />
