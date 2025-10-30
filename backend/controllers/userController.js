@@ -8,14 +8,18 @@ const nodemailer = require("nodemailer");
 module.exports = {
     register: async (req, res) => {
         const { username, email, password } = req.body;
+        console.log("Registering user with email:", email);
         try {
             const existingUser = await User.findOne({ email });
             if (existingUser) {
                 return res.status(400).json({ message: "Email già in uso" });
             }
             const verificationToken = crypto.randomBytes(32).toString('hex');
-            const newUser = new User({ username, email, password });
+            console.log("Generated verification token:", verificationToken);
+            const newUser = new User({ username, email, password, verificationToken });
+            console.log("New user created:", newUser);
             await newUser.save();
+            console.log("User saved to database:", newUser);
             const transporter = nodemailer.createTransport({
                 service: 'Gmail',
                 auth: {
@@ -23,14 +27,17 @@ module.exports = {
                     pass: process.env.EMAIL_PASS,
                 },
             });
-            const verificationLink = `${process.env.FRONTEND_URL}/verify-email?token=${verificationToken}`;
-
+            console.log("Nodemailer transporter created");
+            const URL = process.env.FRONTEND_URL || 'http://localhost:5173';
+            const verificationLink = `${URL}/verify-email?token=${verificationToken}`;
+            console.log("Verification link created:", verificationLink);
             await transporter.sendMail({
                 from: process.env.EMAIL_USER,
                 to: email,
                 subject: 'Verifica la tua email',
                 html: `<p>Clicca sul link per verificare la tua email: <a href="${verificationLink}">${verificationLink}</a></p>`,
             });
+            console.log("Verification email sent to:", email);
             res.status(201).json({
                 message: "Registrazione avvenuta! Controlla la tua email per verificare l'account."
             });

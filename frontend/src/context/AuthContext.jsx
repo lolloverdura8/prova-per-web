@@ -8,7 +8,7 @@ export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
 
-    // Verifica l'autenticazione usando sia i cookie che localStorage
+    // Verifica l'autenticazione usando i cookie
     useEffect(() => {
         const verifyAuth = async () => {
 
@@ -94,7 +94,7 @@ export const AuthProvider = ({ children }) => {
     // Funzione di registrazione
     const register = async (userData) => {
         try {
-            const response = await api.get("/api/users/register", userData);
+            const response = await api.post("/api/users/register", userData);
             return { success: true, message: response.data.message };
         } catch (error) {
             console.error("Errore di registrazione:", error);

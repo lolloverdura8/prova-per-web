@@ -37,7 +37,9 @@ const LoginPage = () => {
                 if (result.success) {
                     // Se la registrazione ha successo, naviga alla pagina principale
                     console.log("Registrazione avvenuta con successo");
-                    navigate('/home');
+                    alert("Registrazione avvenuta con successo! Controlla la tua email per verificare l'account.");
+                    setIsRegister(false);// Torna al form di login dopo la registrazione
+                    navigate('/login');
                 } else {
                     alert("Errore nella registrazione. Riprova.");
                 }

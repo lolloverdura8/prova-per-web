@@ -30,6 +30,7 @@ function App() {
                     <Router>
                         <Routes>
                             <Route path="/" element={<LoginPage />} />
+                            <Route path="/login" element={<LoginPage />} />
                             <Route path="/verify-email" element={<VerifyEmail />} />
                             <Route path="/home" element={<HomePage />} />
                             <Route path="/search" element={<SearchPage />} />
