@@ -31,6 +31,9 @@ module.exports = {
             const URL = process.env.FRONTEND_URL || 'http://localhost:5173';
             const verificationLink = `${URL}/verify-email?token=${verificationToken}`;
             console.log("Verification link created:", verificationLink);
+            console.log("testing transporter sendMail");
+            await transporter.verify();
+            console.log("SMTP connection OK ✅");
             await transporter.sendMail({
                 from: process.env.EMAIL_USER,
                 to: email,
