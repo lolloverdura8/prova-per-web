@@ -21,10 +21,11 @@ module.exports = {
             await newUser.save();
             console.log("User saved to database:", newUser);
             const transporter = nodemailer.createTransport({
-                service: 'Gmail',
+                host: "sandbox.smtp.mailtrap.io",
+                port: 2525,
                 auth: {
-                    user: process.env.EMAIL_USER,
-                    pass: process.env.EMAIL_PASS,
+                    user: process.env.MAILTRAP_USER,
+                    pass: process.env.MAILTRAP_PASS,
                 },
             });
             console.log("Nodemailer transporter created");
@@ -32,10 +33,10 @@ module.exports = {
             const verificationLink = `${URL}/verify-email?token=${verificationToken}`;
             console.log("Verification link created:", verificationLink);
             console.log("testing transporter sendMail");
-            transporter.verify();
+            await transporter.verify();
             console.log("SMTP connection OK ✅");
-            transporter.sendMail({
-                from: process.env.EMAIL_USER,
+            await transporter.sendMail({
+                from: '"UniSocial" <noreply@UniSocial.com>',
                 to: email,
                 subject: 'Verifica la tua email',
                 html: `<p>Clicca sul link per verificare la tua email: <a href="${verificationLink}">${verificationLink}</a></p>`,
