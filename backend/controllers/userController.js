@@ -22,7 +22,7 @@ module.exports = {
             console.log("User saved to database:", newUser);
             const transporter = nodemailer.createTransport({
                 host: "sandbox.smtp.mailtrap.io",
-                port: 2525,
+                port: 25,
                 auth: {
                     user: process.env.MAILTRAP_USER,
                     pass: process.env.MAILTRAP_PASS,
