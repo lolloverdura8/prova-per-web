@@ -2,3 +2,11 @@ backend/node_modules
 frontend/node_modules
 backend/.env
 node_modules
+*.aux
+*.log
+*.out
+*.toc
+*.synctex.gz
+*.fls
+*.fdb_latexmk
+*.pdf
