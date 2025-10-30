@@ -32,9 +32,9 @@ module.exports = {
             const verificationLink = `${URL}/verify-email?token=${verificationToken}`;
             console.log("Verification link created:", verificationLink);
             console.log("testing transporter sendMail");
-            await transporter.verify();
+            transporter.verify();
             console.log("SMTP connection OK ✅");
-            await transporter.sendMail({
+            transporter.sendMail({
                 from: process.env.EMAIL_USER,
                 to: email,
                 subject: 'Verifica la tua email',
