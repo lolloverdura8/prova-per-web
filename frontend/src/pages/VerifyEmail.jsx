@@ -5,7 +5,7 @@ import { api } from "../utils/apiClients";
 const VerifyEmail = () => {
     const [searchParams] = useSearchParams();
     const token = searchParams.get("token");
-    const [message, setMessage] = useState("Verifica in corso...");
+    const [message, setMessage] = useState("Email verificata con successo!, chiudi questa pagina e torna al login.");
     useEffect(() => {
         if (!token) {
             setMessage("Token di verifica mancante.");
