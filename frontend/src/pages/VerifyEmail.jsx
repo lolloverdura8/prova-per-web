@@ -12,19 +12,21 @@ const VerifyEmail = () => {
             return;
         }
         console.log("Verifying email with token:", token);
-        api.get(`/api/auth/verify-email?token=${token}`)
-            .then((res) => {
-                if (res.data.success) {
-                    setMessage("Email verificata con successo! Puoi ora effettuare il login.");
+        const verifyEmail = async () => {
+            try {
+                const response = await api.get(`/api/verify-email?token=${token}`);
+                console.log("Verification response:", response.data);
+                if (response.data.success) {
+                    setMessage("Email verificata con successo!");
                 } else {
-                    setMessage("Link non valido o scaduto.");
+                    setMessage("Verifica fallita: " + (response.data.message || "Errore sconosciuto."));
                 }
-            })
-            .catch((error) => {
-                console.error("Errore durante la verifica dell'email:", error);
-                setMessage("Errore durante la verifica dell'email. Il token potrebbe essere non valido o scaduto.");
-            });
-
+            } catch (error) {
+                console.error("Error during email verification:", error);
+                setMessage("Errore durante la verifica dell'email.");
+            }
+        };
+        verifyEmail();
     }, [token]);
 
     return (
