@@ -14,7 +14,7 @@ const VerifyEmail = () => {
         console.log("Verifying email with token:", token);
         const verifyEmail = async () => {
             try {
-                const response = await api.get(`/api/verify-email?token=${token}`);
+                const response = await api.get(`/api/auth/verify-email?token=${token}`);
                 console.log("Verification response:", response.data);
                 if (response.data.success) {
                     setMessage("Email verificata con successo!");
