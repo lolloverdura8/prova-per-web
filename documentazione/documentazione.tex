@@ -44,7 +44,7 @@ L’applicazione è strutturata secondo l’architettura classica di una \textbf
 \end{itemize}
 
 \section{Diagramma UML dei casi d’uso}
-\begin{figure}[h!]
+\begin{figure}[H]
     \centering
     \includegraphics[width=0.8\textwidth]{usecase.png}
     \caption{Diagramma UML dei casi d’uso principali dell’applicazione}
@@ -70,6 +70,7 @@ Il modello dei dati è stato progettato per garantire coerenza, scalabilità e s
     \begin{itemize}
         \item \texttt{\_id}: identificativo univoco
         \item \texttt{username}, \texttt{email}, \texttt{password (hash)}
+        \item \texttt{isVerified}, \texttt{verificationToken}
         \item \texttt{createdAt}, \texttt{updatedAt}
     \end{itemize}
 
@@ -92,8 +93,6 @@ Il modello dei dati è stato progettato per garantire coerenza, scalabilità e s
     \end{itemize}
 \end{itemize}
 
-Le entità sono correlate in modo da permettere l’agevole gestione delle relazioni tra utenti e post, pur mantenendo la flessibilità tipica dei database non relazionali.
-
 \section{Documentazione delle API (Backend)}
 Le principali API REST sono organizzate come segue:
 
@@ -102,6 +101,7 @@ Le principali API REST sono organizzate come segue:
     \item \texttt{POST /register} – Crea un nuovo utente (richiede username, email e password)
     \item \texttt{POST /login} – Autentica un utente e genera un token JWT
     \item \texttt{GET /logout} – Termina la sessione rimuovendo il cookie di autenticazione
+    \item \texttt{GET /verify-email} – Verifica l’indirizzo email dell’utente tramite token univoco
 \end{itemize}
 
 \subsection{Utenti (/api/users)}
@@ -146,7 +146,44 @@ Il frontend è strutturato in componenti modulari, ciascuno con un ruolo ben def
     \item \textbf{NotificationPage.jsx}: mostra le notifiche ricevute, aggiornate in tempo reale.
     \item \textbf{PostModal.jsx}: gestisce la creazione di nuovi post.
     \item \textbf{NavBar.jsx} e \textbf{SideBar.jsx}: componenti grafici per la navigazione.
+    \item \textbf{VerifyEmail.jsx}: gestisce la conferma dell’indirizzo email tramite token di verifica.
 \end{itemize}
 
 Ogni componente comunica con il backend tramite Axios e sfrutta gli \textit{hook} di React per la gestione dello stato e degli effetti collaterali.
+
+\section{Sicurezza e autenticazione}
+L’applicazione adotta diverse strategie per garantire un accesso sicuro e la protezione dei dati:
+\begin{itemize}
+    \item \textbf{Hashing delle password:} con \texttt{bcrypt}.
+    \item \textbf{Token JWT e cookie HttpOnly:} per mantenere la sessione.
+    \item \textbf{CSRF Protection:} implementata tramite \texttt{csrf-csrf}.
+    \item \textbf{Rate Limiting:} per limitare le richieste ripetute.
+    \item \textbf{Sanificazione input e headers di sicurezza:} tramite \texttt{helmet}, \texttt{xss-clean} e \texttt{express-mongo-sanitize}.
+    \item \textbf{Verifica email:} con token monouso inviato via email.
+\end{itemize}
+
+\section{Architettura distribuita e tecniche avanzate}
+Il deploy dell’applicazione è basato su tre servizi:
+\begin{itemize}
+    \item \textbf{Frontend:} su \textit{Vercel}.
+    \item \textbf{Backend:} su \textit{Render}.
+    \item \textbf{Database:} su \textit{MongoDB Atlas}.
+\end{itemize}
+La comunicazione tra frontend e backend avviene tramite HTTPS e CORS configurato per accettare solo il dominio ufficiale.  
+L’app è containerizzata tramite Docker per semplificare l’avvio in locale.
+
+\section{Interazione real-time con Socket.IO}
+Ogni utente autenticato si collega a una stanza identificata dal proprio \texttt{userId}.  
+Eventi come like o commenti generano notifiche in tempo reale, inviate con \texttt{socket.emit()} e gestite dal componente \textbf{SocketContext.jsx}.
+
+
+
+\section{Tecniche di sviluppo e testing}
+\begin{itemize}
+    \item Test API tramite Postman.
+    \item Test real-time tramite sessioni multiple.
+    \item Logging e debugging lato server.
+    \item Gestione versionamento con GitHub.
+\end{itemize}
+
 \end{document}
