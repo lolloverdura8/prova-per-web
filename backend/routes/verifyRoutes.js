@@ -10,6 +10,7 @@ router.get("/verify-email", async (req, res) => {
 
         user.isVerified = true;
         await user.save();
+        res.status(200).json({ success: true, message: "Email verificata con successo" });
     } catch (error) {
         console.error(error);
         res.status(500).send("Errore durante la verifica dell'email");
