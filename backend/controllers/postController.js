@@ -26,8 +26,8 @@ const sendPaginated = (res, { data, page, limit, total }) => {
 
 // Popoliamo solo i campi necessari per snellire il payload
 const POST_POPULATE = [
-    { path: "author", select: "username avatar" },
-    { path: "comments.user", select: "username avatar" },
+    { path: "author", select: "username" },
+    { path: "comments.user", select: "username" },
 ];
 
 // ----------------- Controller -----------------
