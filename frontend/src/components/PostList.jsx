@@ -74,7 +74,7 @@ const PostList = ({ refreshTrigger, savedMode }) => {
         setFilteredPosts([]);
         setUniqueAuthors([]);
         setUniqueTags([]);
-        setPage(1);
+        setPage(0);
         setHasMore(true);
         setError("");
         await fetchPage();

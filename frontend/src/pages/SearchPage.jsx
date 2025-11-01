@@ -6,6 +6,7 @@ import Navbar from "../components/NavBar";
 import Post from "../components/Post";
 import { FaSearch, FaTimes } from "react-icons/fa";
 import "../styles/SearchPage.css";
+import "../styles/HomePage.css";
 // import { authCookies } from "../utils/cookieUtils";
 
 
