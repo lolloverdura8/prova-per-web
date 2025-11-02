@@ -11,18 +11,18 @@ const VerifyEmail = () => {
             setMessage("Token di verifica mancante.");
             return;
         }
-        console.log("Verifying email with token:", token);
+        console.log("Verifica email con token:", token);
         const verifyEmail = async () => {
             try {
                 const response = await api.get(`/api/auth/verify-email?token=${token}`);
-                console.log("Verification response:", response.data);
+                console.log("Verifica response:", response.data);
                 if (response.data.success) {
                     setMessage("Email verificata con successo!");
                 } else {
                     setMessage("Verifica fallita: " + (response.data.message || "Errore sconosciuto."));
                 }
             } catch (error) {
-                console.error("Error during email verification:", error);
+                console.error("Errore durante la verifica della mail", error);
                 setMessage("Errore durante la verifica dell'email.");
             }
         };

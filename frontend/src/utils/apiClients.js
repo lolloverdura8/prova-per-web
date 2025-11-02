@@ -9,10 +9,10 @@ export const initCSRF = async () => {
     try {
         const res = await api.get("/api/csrf-token");
         api.defaults.headers["X-CSRF-Token"] = res.data?.csrfToken;
-        console.log("CSRF token initialized", res.data.csrfToken);
+        console.log("CSRF token inizializzato", res.data.csrfToken);
     }
     catch (error) {
-        console.error("Error initializing CSRF token:", error);
+        console.error("Error inizializzazione CSRF token:", error);
     }
 };
 

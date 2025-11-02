@@ -9,7 +9,7 @@ router.post('/register', userController.register);
 // Login
 router.post('/login', async (req, res, next) => {
     try {
-        console.log("Login attempt:", req.body);
+        console.log("Tenativo di login:", req.body);
         await userController.login(req, res);
     } catch (error) {
         console.error("Login error:", error);

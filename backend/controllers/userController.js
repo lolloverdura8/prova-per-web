@@ -8,18 +8,18 @@ const nodemailer = require("nodemailer");
 module.exports = {
     register: async (req, res) => {
         const { username, email, password } = req.body;
-        console.log("Registering user with email:", email);
+        console.log("Registrazione con email:", email);
         try {
             const existingUser = await User.findOne({ email });
             if (existingUser) {
                 return res.status(400).json({ message: "Email già in uso" });
             }
             const verificationToken = crypto.randomBytes(32).toString('hex');
-            console.log("Generated verification token:", verificationToken);
+            console.log("Generazione token:", verificationToken);
             const newUser = new User({ username, email, password, verificationToken });
-            console.log("New user created:", newUser);
+            console.log("Nuovo utente creato", newUser);
             await newUser.save();
-            console.log("User saved to database:", newUser);
+            console.log("User salvato nel database", newUser);
             const transporter = nodemailer.createTransport({
                 host: "sandbox.smtp.mailtrap.io",
                 port: 2525,
@@ -28,20 +28,20 @@ module.exports = {
                     pass: process.env.MAILTRAP_PASS,
                 },
             });
-            console.log("Nodemailer transporter created");
+            console.log("Nodemailer transporter creato");
             const URL = process.env.FRONTEND_URL || 'http://localhost:5173';
             const verificationLink = `${URL}/verify-email?token=${verificationToken}`;
-            console.log("Verification link created:", verificationLink);
-            console.log("testing transporter sendMail");
+            console.log("Verification link creato:", verificationLink);
+            console.log("test transporter sendMail");
             await transporter.verify();
-            console.log("SMTP connection OK ✅");
+            console.log("SMTP connection OK ");
             await transporter.sendMail({
                 from: '"UniSocial" <noreply@UniSocial.com>',
                 to: email,
                 subject: 'Verifica la tua email',
                 html: `<p>Clicca sul link per verificare la tua email: <a href="${verificationLink}">${verificationLink}</a></p>`,
             });
-            console.log("Verification email sent to:", email);
+            console.log("email di verifica inviata a:", email);
             res.status(201).json({
                 message: "Registrazione avvenuta! Controlla la tua email per verificare l'account."
             });
@@ -54,28 +54,28 @@ module.exports = {
         const { email, password } = req.body;
         try {
             const user = await User.findOne({ email });
-            console.log("User found for login:", user);
+            console.log("User trovato:", user);
             if (!user || !(await bcrypt.compare(password, user.password))) {
                 return res.status(400).json({ message: "Credenziali errate" });
             } else if (!user.isVerified) {
                 return res.status(400).json({ message: "Account non verificato. Controlla la tua email." });
             }
 
-            console.log("Password verified for user:", user._id);
+            console.log("Password verificata per l user:", user._id);
             // Rimuovi la password dall'oggetto utente
             const userObj = user.toObject();
             delete userObj.password;
 
-            console.log("Generating JWT token for user:", user._id);
+            console.log("Genero toker JWT", user._id);
 
             const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
                 expiresIn: "7d",
             });
-            console.log("Login successful, token generated");
+            console.log("Login ok, token generato");
             res.cookie('token', token, { httpOnly: true, secure: true, sameSite: 'none', maxAge: 7 * 24 * 60 * 60 * 1000 });
-            console.log("Cookie set for token");
+            console.log("Cookie impostato nel login");
             res.json({ token, user: userObj });
-            console.log("Login response sent");
+            console.log("risposta inviata al client");
         } catch (err) {
             res.status(500).json({ error: err.message });
         }
