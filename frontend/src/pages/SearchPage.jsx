@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+//import { useNavigate } from "react-router-dom";
 import { api } from "../utils/apiClients";
 import Sidebar from "../components/SideBar";
 import Navbar from "../components/NavBar";
@@ -27,7 +27,7 @@ const SearchPage = () => {
     const [error, setError] = useState("");
     // Stato per memorizzare eventuali errori durante la ricerca
 
-    const navigate = useNavigate();
+    // const navigate = useNavigate();
     // Inizializza la funzione di navigazione
 
     // Autenticare l'utente quando la pagina si carica
