@@ -22,11 +22,11 @@ export const AuthProvider = ({ children }) => {
             // const token = tokenFromCookie || tokenFromStorage;
 
 
-            // if (!token) {
-            //     setUser(null);
-            //     setLoading(false);
-            //     return;
-            // }
+            if (!token) {
+                setUser(null);
+                setLoading(false);
+                return;
+            }
 
             try {
                 await initCSRF(); // Inizializza il token CSRF

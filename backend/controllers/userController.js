@@ -133,8 +133,10 @@ module.exports = {
     },
 
     logout: (req, res) => {
+        res.cookie('token', '', { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'Lax', expires: new Date(0) });
         res.clearCookie('token', { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'Lax' });
         res.clearCookie('x-csrf-token', { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'Lax' });
+
         res.json({ message: 'Logout effettuato con successo' });
         console.log("Logout effettuato con successo");
     }
