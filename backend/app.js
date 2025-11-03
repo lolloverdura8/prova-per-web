@@ -59,8 +59,8 @@ app.use(
     })
 );
 
-// ================= CSRF PROTECTION =================
-const {
+// ================= CSRF PROTECTION ================= è un middleware per proteggere dalle richieste CSRF (Cross-Site Request Forgery). 
+const { // in pratica assicura che le richieste al server provengano da fonti affidabili, prevenendo attacchi in cui un utente malintenzionato tenta di eseguire azioni non autorizzate a nome di un utente autenticato.
     generateToken,
     doubleCsrfProtection,
     invalidCsrfTokenError,

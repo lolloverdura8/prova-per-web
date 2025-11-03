@@ -12,7 +12,7 @@ export const SocketProvider = ({ children }) => {
     console.log("SocketProvider montato!");
     const auth = useAuth();
     const user = auth ? auth.user : null;
-    const socketRef = useRef(null); // Crea un ref per memorizzare l'istanza socket (socketRef.current), così da poterla leggere/modificare senza provocare rerender.
+    const socketRef = useRef(null); // Crea un ref per memorizzare l'istanza socket (socketRef.current), così da poterla leggere/modificare senza provocare rerender. current è la proprietà che contiene l'istanza effettiva del socket cioè l'oggetto restituito da io()
     const [hasUnreadNotifications, setHasUnreadNotifications] = useState(false); // Stato per notifiche non lette
     const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || "http://localhost:3000";
     // Segna tutte le notifiche come lette
@@ -63,7 +63,7 @@ export const SocketProvider = ({ children }) => {
             }); // Connetti al server Socket.IO
             socketRef.current.on("connect", () => { // Evento di connessione riuscita
                 console.log("Socket connesso!", socketRef.current.id);
-                socketRef.current.emit("join", user._id); // Unisciti a una stanza specifica per l'utente
+                socketRef.current.emit("join", user._id); // Unisciti a una stanza specifica per l'utente, emettendo l'evento "join" con l'ID utente verso il server nel backend
                 console.log("Join stanza", user._id);
             });
             // socketRef è il riferimento all'istanza socket, usiamo socketRef.current per accedere all'istanza effettiva e registrare gli eventi e inviare messaggi. 
