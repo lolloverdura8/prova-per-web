@@ -81,7 +81,8 @@ export const AuthProvider = ({ children }) => {
     const logout = async () => {
         try {
             await api.post('/api/users/logout');/*, withAuth(token)*/
-            await initCSRF(); // Re-inizializza il token CSRF dopo il logout
+            await initCSRF();
+            navigate("/login")// Re-inizializza il token CSRF dopo il logout
         } catch (error) {
             console.error("Errore di logout:", error);
         }
